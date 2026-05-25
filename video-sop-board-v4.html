@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ShortsBoard</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F3EF;--bg2:#ECEAE3;--bg3:#FFFFFF;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
+  --text:#1A1A1A;--text2:#555;--text3:#999;
+  --purple:#534AB7;--purple-bg:#EEEDFE;
+  --orange:#D85A30;--orange-bg:#FAECE7;
+  --green:#0F6E56;--green-bg:#E1F5EE;
+  --amber:#BA7517;--amber-bg:#FAEEDA;
+  --pink:#993556;--pink-bg:#FBEAF0;
+  --blue:#185FA5;--blue-bg:#E6F1FB;
+  --r:14px;--r-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.header{background:var(--bg3);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.header-logo{width:36px;height:36px;background:var(--purple);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.header-title{font-size:16px;font-weight:700}
+.header-sub{font-size:11px;color:var(--text3)}
+.header-info{flex:1}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 18px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 8px;text-align:center}
+.stat-icon{font-size:18px;margin-bottom:4px}
+.stat-num{font-size:22px;font-weight:700;line-height:1}
+.stat-label{font-size:10px;color:var(--text3);margin-top:3px}
+.s-total .stat-num{color:var(--purple)}
+.s-active .stat-num{color:var(--orange)}
+.s-review .stat-num{color:var(--amber)}
+.s-done .stat-num{color:var(--green)}
+.filters{display:flex;gap:8px;padding:0 18px 12px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--bg3);font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px}
+.filter-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+.filter-count{background:rgba(255,255,255,0.3);border-radius:10px;padding:1px 6px;font-size:10px}
+.filter-btn:not(.active) .filter-count{background:var(--bg2);color:var(--text3)}
+.project-list{padding:0 18px 100px}
+.project-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;transition:all .15s}
+.project-card:hover{border-color:var(--border2);box-shadow:0 4px 16px rgba(0,0,0,0.08)}
+.project-card:active{transform:scale(0.99)}
+.project-card.urgent{border-left:3px solid var(--orange)}
+.pc-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
+.pc-title{font-size:14px;font-weight:700;flex:1;line-height:1.4}
+.pc-arrow{color:var(--text3);font-size:16px;margin-top:1px}
+.pc-meta{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.pc-stage{font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px}
+.pc-tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500}
+.pc-bar{display:flex;gap:3px;align-items:center}
+.pb-seg{height:5px;border-radius:3px;flex:1;background:var(--bg2)}
+.pc-count{font-size:11px;color:var(--text3);margin-left:4px;flex-shrink:0}
+.fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;background:var(--purple);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:26px;color:#fff;box-shadow:0 4px 16px rgba(83,74,183,0.4);z-index:9;transition:transform .15s}
+.fab:active{transform:scale(0.93)}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:20}
+.overlay.on{display:block}
+.panel{position:fixed;inset:0;background:var(--bg);z-index:21;overflow-y:auto;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.panel.on{transform:translateX(0)}
+.panel-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;align-items:flex-start;gap:10px;position:sticky;top:0;z-index:5}
+.panel-back{background:var(--bg2);border:none;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--text2);flex-shrink:0;margin-top:2px}
+.panel-info{flex:1}
+.panel-title{font-size:15px;font-weight:700;line-height:1.4}
+.panel-stage{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:6px;margin-top:4px}
+.panel-body{padding:14px 18px 80px}
+.section-title{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px;display:flex;align-items:center;gap:6px}
+.section-title:first-child{margin-top:0}
+.form-banner{background:var(--purple-bg);border:1px solid rgba(83,74,183,0.2);border-radius:var(--r);padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;cursor:pointer;text-decoration:none}
+.form-banner-icon{font-size:28px;flex-shrink:0}
+.form-banner-info{flex:1}
+.form-banner-title{font-size:13px;font-weight:700;color:var(--purple)}
+.form-banner-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.form-banner-arrow{font-size:16px;color:var(--purple)}
+.node-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.node-card.node-active{border-color:var(--purple)}
+.node-card.node-done{opacity:.72}
+.node-header{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer}
+.node-header:active{background:var(--bg)}
+.node-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.node-name{font-size:13px;font-weight:600;flex:1}
+.node-badge{font-size:10px;font-weight:500;padding:3px 8px;border-radius:10px}
+.nb-done{background:var(--green-bg);color:var(--green)}
+.nb-active{background:var(--purple-bg);color:var(--purple)}
+.nb-wait{background:var(--bg2);color:var(--text3)}
+.nb-review{background:var(--amber-bg);color:var(--amber)}
+.node-chevron{font-size:14px;color:var(--text3);transition:transform .2s;margin-left:2px}
+.node-chevron.open{transform:rotate(90deg)}
+.node-body{display:none;border-top:1px solid var(--border);background:var(--bg);padding:12px 14px}
+.node-body.open{display:block}
+.ns-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.05em;margin-bottom:8px;text-transform:uppercase}
+.content-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;font-size:12px;color:var(--text2);line-height:1.8;white-space:pre-wrap;margin-bottom:12px}
+.progress-detail{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;margin-bottom:12px}
+.progress-bar-full{height:8px;background:var(--bg2);border-radius:4px;margin-bottom:8px;overflow:hidden}
+.progress-bar-fill{height:100%;border-radius:4px;transition:width .3s}
+.progress-pct{font-size:13px;font-weight:700;color:var(--text)}
+.progress-sub{font-size:11px;color:var(--text3)}
+/* ── 分鏡卡片 ── */
+.scene-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.scene-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.scene-card.scene-done{opacity:.65}
+.scene-card.scene-done .scene-card-header{background:var(--green-bg)}
+.scene-card-header{background:var(--orange-bg);padding:10px 14px;display:flex;align-items:center;gap:10px}
+.scene-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.scene-card.scene-done .scene-num{background:var(--green)}
+.scene-title{font-size:13px;font-weight:700;flex:1;color:var(--text)}
+.scene-time{font-size:11px;color:var(--text3);flex-shrink:0}
+.scene-done-badge{font-size:10px;background:var(--green);color:#fff;padding:2px 8px;border-radius:10px;font-weight:500}
+.scene-body{padding:12px 14px}
+.scene-row{display:flex;gap:8px;margin-bottom:10px}
+.scene-info{flex:1}
+.scene-info-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.04em;margin-bottom:4px}
+.scene-info-text{font-size:12px;color:var(--text2);line-height:1.6}
+.scene-divider{width:1px;background:var(--border);flex-shrink:0}
+.scene-check-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);cursor:pointer;width:100%;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);transition:all .15s}
+.scene-check-btn.done{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.scene-check-icon{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.scene-check-btn.done .scene-check-icon{background:var(--green);border-color:var(--green);color:#fff}
+.scene-notes{margin-top:8px}
+.scene-notes-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.scene-notes-box{width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:inherit;color:var(--text);background:var(--bg3);resize:none;outline:none;min-height:50px}
+.scene-notes-box:focus{border-color:var(--orange)}
+.checklist{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;background:var(--bg3);border:1px solid var(--border)}
+.check-item:active{background:var(--bg2)}
+.check-item.checked .ci-text{text-decoration:line-through;color:var(--text3)}
+.check-box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}
+.check-box.on{background:var(--green);border-color:var(--green);color:#fff}
+.ci-text{font-size:12px;color:var(--text2);line-height:1.5}
+.upload-area{border:1.5px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;margin-bottom:12px;cursor:pointer}
+.upload-area:hover{background:var(--bg2)}
+.upload-icon{font-size:28px;margin-bottom:6px}
+.upload-label{font-size:12px;color:var(--text3)}
+.comments{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.comment{border-radius:var(--r-sm);padding:9px 11px}
+.user-c{background:var(--bg3);border:1px solid var(--border)}
+.ai-c{background:var(--purple-bg);border-left:2px solid var(--purple)}
+.c-author{font-size:11px;font-weight:700;margin-bottom:3px}
+.user-c .c-author{color:var(--text2)}
+.ai-c .c-author{color:var(--purple)}
+.c-text{font-size:12px;color:var(--text2);line-height:1.6}
+.c-time{font-size:10px;color:var(--text3);margin-top:3px}
+.comment-row{display:flex;gap:8px;margin-top:8px}
+.comment-row input{flex:1;font-size:13px;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--bg3);color:var(--text);font-family:inherit;outline:none}
+.comment-row input:focus{border-color:var(--purple)}
+.send-btn{background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);padding:10px 14px;font-size:13px;cursor:pointer;font-family:inherit}
+/* ── 指令庫 ── */
+.prompt-section{margin-bottom:12px}
+.prompt-tab-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.prompt-tab{padding:5px 12px;border-radius:16px;border:1px solid var(--border2);background:var(--bg3);font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;font-family:inherit}
+.prompt-tab.active{color:#fff;border-color:transparent}
+.prompt-cards{display:flex;flex-direction:column;gap:8px}
+.prompt-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.prompt-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px}
+.prompt-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.prompt-title{font-size:12px;font-weight:600;flex:1;color:var(--text)}
+.prompt-copy-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-weight:500;flex-shrink:0}
+.prompt-body{padding:10px 12px;border-top:1px solid var(--border);background:var(--bg)}
+.prompt-text{font-size:11px;color:var(--text2);line-height:1.7;white-space:pre-wrap;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;margin-bottom:8px;max-height:200px;overflow-y:auto}
+.prompt-note{font-size:11px;color:var(--purple);background:var(--purple-bg);padding:6px 10px;border-radius:var(--r-sm)}
+.copy-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;z-index:100;opacity:0;transition:opacity .3s;pointer-events:none}
+.copy-toast.show{opacity:1}
+/* ── Modal ── */
+.modal{position:fixed;inset:0;z-index:30;display:none;align-items:flex-end;justify-content:center}
+.modal.on{display:flex}
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.4)}
+.modal-box{position:relative;background:var(--bg3);border-radius:20px 20px 0 0;padding:20px 18px 40px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px}
+.form-label{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;display:block}
+.form-input{width:100%;padding:12px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;margin-bottom:14px}
+.form-input:focus{border-color:var(--purple)}
+.form-select{width:100%;padding:12px 14px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;margin-bottom:14px}
+.urgent-row{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:16px}
+.urgent-label{flex:1;font-size:13px;font-weight:500}
+.urgent-sub{font-size:11px;color:var(--text3)}
+.toggle{width:44px;height:26px;background:var(--bg2);border-radius:13px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--purple)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+.toggle.on .toggle-thumb{left:21px}
+.create-btn{width:100%;padding:14px;background:var(--purple);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.modal-close{position:absolute;top:16px;right:16px;background:var(--bg2);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--text2)}
+@media(min-width:640px){
+  .panel{left:auto;right:0;width:440px;border-left:1px solid var(--border)}
+  .fab{bottom:30px;right:30px}
+  .scene-row{flex-direction:row}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-logo">🎬</div>
+  <div class="header-info">
+    <div class="header-title">ShortsBoard</div>
+    <div class="header-sub">短影音製作管理看板</div>
+  </div>
+</div>
+<div class="stats">
+  <div class="stat-card s-total"><div class="stat-icon">🎞️</div><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
+  <div class="stat-card s-active"><div class="stat-icon">▶️</div><div class="stat-num" id="s-active">0</div><div class="stat-label">Active</div></div>
+  <div class="stat-card s-review"><div class="stat-icon">⏰</div><div class="stat-num" id="s-review">0</div><div class="stat-label">Review</div></div>
+  <div class="stat-card s-done"><div class="stat-icon">✅</div><div class="stat-num" id="s-done">0</div><div class="stat-label">Done</div></div>
+</div>
+<div class="filters" id="filters"></div>
+<div class="project-list" id="project-list"></div>
+<button class="fab" onclick="openModal()">＋</button>
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="panel-header">
+    <button class="panel-back" onclick="closePanel()">‹</button>
+    <div class="panel-info">
+      <div class="panel-title" id="p-title"></div>
+      <span class="panel-stage" id="p-stage"></span>
+    </div>
+  </div>
+  <div class="panel-body" id="p-body"></div>
+</div>
+<div class="modal" id="modal">
+  <div class="modal-bg" onclick="closeModal()"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">新增影片專案</div>
+    <label class="form-label">影片標題</label>
+    <input class="form-input" id="new-title" placeholder="例如：3 個讓你睡前放鬆的方法" />
+    <label class="form-label">類別標籤</label>
+    <select class="form-select" id="new-tag">
+      <option value="health">健康 Health</option>
+      <option value="life">生活 Lifestyle</option>
+      <option value="finance">理財 Finance</option>
+      <option value="work">職場 Workplace</option>
+      <option value="mind">身心靈 Mindfulness</option>
+      <option value="edu">教學 Education</option>
+    </select>
+    <label class="form-label">初始狀態</label>
+    <select class="form-select" id="new-stage">
+      <option value="pending">待開始</option>
+      <option value="script">腳本產出</option>
+      <option value="shoot">拍攝中</option>
+      <option value="edit">後製中</option>
+      <option value="review">待審核</option>
+      <option value="schedule">排程發布</option>
+      <option value="done">已發布</option>
+    </select>
+    <div class="urgent-row">
+      <div><div class="urgent-label">標記為緊急</div><div class="urgent-sub">顯示高優先度標示</div></div>
+      <div class="toggle" id="urgent-toggle" onclick="toggleUrgent()"><div class="toggle-thumb"></div></div>
+    </div>
+    <button class="create-btn" onclick="createProject()">建立專案</button>
+  </div>
+</div>
+<div class="copy-toast" id="copy-toast">✅ 已複製！貼給 Claude 使用</div>
+
+<script>
+var PHASES = [
+  {key:'script', label:'腳本產出', color:'#534AB7', icon:'✍️'},
+  {key:'shoot',  label:'拍攝執行', color:'#D85A30', icon:'🎬'},
+  {key:'edit',   label:'CapCut 後製', color:'#0F6E56', icon:'✂️'},
+  {key:'cover',  label:'封面圖卡', color:'#BA7517', icon:'🖼️'},
+  {key:'copy',   label:'發布文案', color:'#993556', icon:'📝'},
+  {key:'publish',label:'排程發布', color:'#185FA5', icon:'🚀'}
+];
+
+var STAGE_COLORS = {
+  pending: {bg:'#F1EFE8',color:'#888780',label:'待開始'},
+  script:  {bg:'#EEEDFE',color:'#534AB7',label:'腳本產出'},
+  shoot:   {bg:'#FAECE7',color:'#D85A30',label:'拍攝中'},
+  edit:    {bg:'#E1F5EE',color:'#0F6E56',label:'後製中'},
+  review:  {bg:'#FAEEDA',color:'#BA7517',label:'待審核'},
+  schedule:{bg:'#E6F1FB',color:'#185FA5',label:'排程發布'},
+  done:    {bg:'#EAF3DE',color:'#3B6D11',label:'已發布'}
+};
+
+var TAGS = {
+  health: {label:'健康',bg:'#E1F5EE',color:'#085041'},
+  life:   {label:'生活',bg:'#FAEEDA',color:'#633806'},
+  finance:{label:'理財',bg:'#E6F1FB',color:'#0C447C'},
+  work:   {label:'職場',bg:'#F1EFE8',color:'#444441'},
+  mind:   {label:'身心靈',bg:'#EEEDFE',color:'#3C3489'},
+  edu:    {label:'教學',bg:'#EAF3DE',color:'#3B6D11'}
+};
+
+var FORM_URLS = {
+  persona:'https://docs.google.com/forms/d/e/1FAIpQLSdDPKn74Q0nvHGMz3CBCMcQPm2fNPc5UI_YnfTFmgpvqT3Mfg/viewform',
+  topic:  'https://docs.google.com/forms/d/e/1FAIpQLSdbStL0GwXDesh5ewfIWpBV1CEegFuV6g-sChOAji6xbEMGXw/viewform'
+};
+
+// ── 30 個 AI 指令庫 ──
+var PROMPTS = {
+  script: [
+    {num:1, title:'人性化口語指令',
+     text:'我是 Rika，1寶媽，說話親切溫暖、直接犀利、故事感強，喜歡用數字舉例。\n觀眾是 28-45 歲的媽媽。\n\n請把以下腳本改得更口語化：\n- 文字白話，像在跟閨蜜聊天\n- 三歲小孩都能聽懂\n- 避免過於機器化的段落結構\n- 適當加入不規則表達\n- 保留核心重點，不改變意思\n\n【貼上你的腳本內容】',
+     note:'貼上腳本後直接使用，不用額外說明'},
+    {num:2, title:'Hook 開頭留住人指令',
+     text:'我是 Rika，專做省錢、理財、育兒、旅遊內容，觀眾是 28-45 歲媽媽。\n\n把以下腳本的開頭改成短影音爆款 Hook：\n- 前三秒要抓住眼球\n- 節奏快、不拖沓\n- 直擊媽媽的痛點或懸念\n- 適合口播、代入情緒\n- 只優化開頭，後半段不動\n\n【貼上你的腳本開頭】',
+     note:'專門用來優化 Hook，其他段落不動'},
+    {num:3, title:'提高完播率指令',
+     text:'我是 Rika，觀眾是忙碌的媽媽，容易滑走。\n\n把以下腳本優化得更生動，提高完播率：\n- 有畫面感，增加氛圍感描寫\n- 盡量將形容詞轉換成場景式表達\n- 讀起來身歷其境、情緒飽滿流暢\n- 不生硬、不空洞\n- 保留原意不改核心內容\n\n【貼上你的腳本內容】',
+     note:'提高觀眾看完整支影片的機率'},
+    {num:4, title:'分鏡腳本產出指令',
+     text:'我是 Rika，1寶媽，不露臉，說話親切直接有故事感。\n影片風格：【教學乾貨/故事分享/輕鬆聊天】\n影片長度：【30-60秒/1-2分鐘】\n主題：【填入主題】\n\n請幫我產出完整分鏡腳本，格式如下：\n- Hook（0-3秒）：畫面說明 + 口播內容\n- 重點一（秒數）：畫面說明 + 口播內容\n- 重點二（秒數）：畫面說明 + 口播內容\n- 重點三（秒數）：畫面說明 + 口播內容\n- CTA（最後5秒）：口播內容\n- 建議檔案命名',
+     note:'填入主題後即可產出完整分鏡'},
+    {num:5, title:'痛點開場指令',
+     text:'我是 Rika，觀眾是 28-45 歲媽媽，她們最在意：省錢、育兒、旅遊、理財。\n\n幫我針對以下主題，產出 3 個不同方向的痛點開場：\n方向一：用數字衝擊（例如：「你每個月多花了 3000 塊，你知道嗎？」）\n方向二：用場景帶入（描述媽媽日常會遇到的情境）\n方向三：用反問句（問一個讓她想繼續聽的問題）\n\n主題：【填入主題】',
+     note:'3個方向選一個最有感的用'},
+    {num:6, title:'懸念開場指令',
+     text:'我是 Rika，做省錢旅遊理財育兒內容，觀眾是台灣媽媽。\n\n幫我針對以下主題，設計一個製造懸念的開場：\n- 說一個讓人很好奇的結果，但不說原因\n- 或說一個反常識的事情\n- 讓觀眾一定要繼續看才知道答案\n- 適合口播，不超過 15 個字\n\n主題：【填入主題】',
+     note:'適合用在「你絕對不知道的...」這類題材'},
+    {num:7, title:'故事化腳本指令',
+     text:'我是 Rika，從愛買轉成愛寶的1寶媽，喜歡用自己的親身經歷說故事。\n\n幫我把以下資訊轉換成故事型腳本：\n- 用第一人稱說故事（「我那時候...」「有一次...」）\n- 帶入具體的場景和情緒\n- 讓觀眾有「我也是這樣！」的感覺\n- 在故事中自然帶出重點和解法\n- 結尾有收尾和 CTA\n\n主題或資訊：【填入內容】',
+     note:'最適合 Rika 的風格，轉化率高'},
+    {num:8, title:'數字強化指令',
+     text:'我是 Rika，喜歡用數字舉例讓媽媽很有感。\n\n幫我把以下腳本中的模糊敘述，換成具體數字或比較：\n- 把「很多」換成具體數字\n- 把「省錢」換成「每月省 XXX 元」\n- 把「很快」換成「3 步驟」「5 分鐘」\n- 數字要符合台灣媽媽的生活情境\n- 保留原意\n\n【貼上你的腳本內容】',
+     note:'讓抽象變具體，讓媽媽更有感'},
+    {num:9, title:'CTA 結尾指令',
+     text:'我是 Rika，觀眾是 28-45 歲媽媽，平台是 IG Reels、YouTube Shorts、FB、LINE 社群。\n\n幫我針對以下影片主題，設計 3 個不同方向的結尾 CTA：\n方向一：邀請留言互動（問一個媽媽一定有感的問題）\n方向二：引導追蹤（說明追蹤後能得到什麼好處）\n方向三：引導分享（讓她自願傳給其他媽媽）\n\n主題：【填入主題】',
+     note:'選一個最符合這支影片目標的 CTA'},
+    {num:10, title:'腳本長度壓縮指令',
+     text:'我是 Rika，做短影音，觀眾注意力有限。\n\n幫我把以下腳本壓縮到適合短影音的長度：\n- 目標長度：【30秒/60秒/90秒】\n- 原意完全不變，留核心觀點\n- 刪除重複或多餘的表達\n- 合併相似的觀點\n- 語句俐落通順，字數變少但資訊密度不降低\n\n【貼上你的腳本內容】',
+     note:'長腳本壓縮成短影音版本專用'},
+  ],
+  edit: [
+    {num:21, title:'爆款標題優化指令',
+     text:'我是 Rika，做省錢育兒旅遊理財短影音，觀眾是台灣媽媽。\n\n幫我針對以下影片主題，產出 5 個爆款標題方向：\n- 方向一：數字型（「3個方法...」「省下5000元的...」）\n- 方向二：反問型（「你知道...嗎？」）\n- 方向三：痛點型（直擊媽媽最在意的問題）\n- 方向四：懸念型（說結果不說原因）\n- 方向五：故事型（「我花了10年才學會的...」）\n\n主題：【填入主題】',
+     note:'5個方向選最有感的一個'},
+    {num:24, title:'完播率檢查指令',
+     text:'幫我檢查以下腳本是否能維持觀眾的完播率：\n- Hook 前三秒夠不夠吸引人？\n- 中間有沒有讓人想滑走的地方？\n- 每 5-10 秒有沒有新資訊或情緒變化？\n- 結尾有沒有讓人想再看一次或分享？\n- 給我具體的修改建議\n\n觀眾設定：28-45 歲台灣媽媽，時間寶貴，容易分心。\n\n【貼上你的腳本內容】',
+     note:'後製前用這個檢查腳本一遍'},
+    {num:25, title:'情緒共鳴加強指令',
+     text:'我是 Rika，觀眾是 28-45 歲的台灣媽媽。\n\n幫我把以下腳本加入更多情緒共鳴：\n- 加入媽媽日常會遇到的具體場景\n- 用「你一定也有過...」「我懂那種感覺...」這類連結語\n- 讓媽媽覺得「她懂我！」\n- 不要說教，要像閨蜜在說話\n- 保留原有的資訊和重點\n\n【貼上你的腳本內容】',
+     note:'讓冷冰冰的資訊變成有溫度的分享'},
+    {num:26, title:'節奏加速指令',
+     text:'幫我把以下腳本的節奏加快，讓它更適合短影音：\n- 刪掉廢話和過渡語（例如：「首先」「接下來」「然後」）\n- 每句話都要有用，沒用的刪掉\n- 句子縮短，多用短句\n- 保持資訊密度，但說話更俐落\n- 讓整體節奏感覺快 30%\n\n【貼上你的腳本內容】',
+     note:'腳本太冗長時使用'},
+  ],
+  cover: [
+    {num:27, title:'封面圖卡標題指令',
+     text:'我是 Rika，做省錢育兒旅遊理財短影音，觀眾是台灣媽媽。\n封面不露臉，純文字圖形設計。\n\n幫我針對以下影片主題，產出封面圖卡所需的文字：\n- 大標題（6字以內，衝擊感強）\n- 副標題（一句話說清楚）\n- 建議封面樣式：A黑底爆字/B紫底撞色/C白底衝擊/D深綠反白/E米白極簡/F橘黃分割\n\n影片主題：【填入主題】\n影片風格：【教學乾貨/故事分享/輕鬆聊天】',
+     note:'大標題6字以內才能一秒被看到'},
+    {num:28, title:'YouTube 縮圖文字指令',
+     text:'我是 Rika，YouTube Shorts 頻道，觀眾是台灣媽媽。\n不露臉，純文字圖形設計。\n\n幫我針對以下影片主題，產出 YouTube 縮圖的文字設計：\n- 主標題（震撼、有數字或問句，不超過 8 字）\n- 副標題（補充說明，不超過 12 字）\n- 強調色文字（最重要的 2-3 個關鍵詞）\n- 建議顏色搭配\n\n影片主題：【填入主題】',
+     note:'YouTube 縮圖決定點擊率，要比 IG 更大膽'},
+    {num:29, title:'系列影片封面一致性指令',
+     text:'我是 Rika，想做一個系列影片，讓觀眾一看封面就知道是同一個系列。\n\n幫我設計這個系列的封面視覺規則：\n- 系列名稱和標識方式\n- 固定的文字位置和格式\n- 每集的差異元素是什麼\n- 建議使用的顏色主軸\n\n系列主題：【填入系列主題】\n預計集數：【填入集數】',
+     note:'系列影片要讓觀眾有追劇感'},
+    {num:30, title:'封面 A/B 測試指令',
+     text:'我是 Rika，想測試哪個封面設計對台灣媽媽更有吸引力。\n\n幫我針對以下影片主題，設計兩個不同方向的封面文案：\n\n版本 A（情感共鳴型）：\n- 用媽媽的痛點或感受當標題\n- 讓她看到就覺得「這說的是我！」\n\n版本 B（數字乾貨型）：\n- 直接說數字和結果\n- 讓她看到就知道「這有用！」\n\n影片主題：【填入主題】',
+     note:'兩個版本輪流試，看哪個互動率更高'},
+  ],
+  copy: [
+    {num:11, title:'IG 貼文文案指令',
+     text:'我是 Rika，IG 帳號是省錢育兒旅遊理財的1寶媽。\n說話風格：親切溫暖、直接犀利、喜歡用數字。\n觀眾：28-45 歲台灣媽媽。\n\n幫我針對以下影片主題，寫一則 IG 貼文說明文案：\n- 第一行是吸睛 Hook\n- 內文簡短有力，3-5 行\n- 重點標籤，自然帶入\n- 結尾邀請互動\n- 不超過 150 字\n\n影片主題：【填入主題】',
+     note:'IG 用，注意第一行決定點閱率'},
+    {num:12, title:'FB 貼文文案指令',
+     text:'我是 Rika，在 FB 分享省錢育兒旅遊理財內容給台灣媽媽。\n\n幫我針對以下影片主題，寫一則 FB 貼文說明文案：\n- 開場用情感故事或媽媽共鳴的場景帶入\n- 中段自然帶出影片核心內容\n- 結尾邀請媽媽分享給需要的人\n- 語氣像在跟老朋友說話\n- 長度 100-200 字\n\n影片主題：【填入主題】',
+     note:'FB 適合稍長、情感溫度高的文案'},
+    {num:13, title:'Threads 貼文指令',
+     text:'我是 Rika，在 Threads 和媽媽們聊省錢育兒旅遊理財。\n\n幫我針對以下影片主題，寫一則 Threads 貼文：\n- 像在聊天，對話感強\n- 開頭直接說重點或問一個問題\n- 不超過 80 字\n- 結尾問一個讓媽媽想回覆的問題\n\n影片主題：【填入主題】',
+     note:'Threads 要像在聊天，不要太正式'},
+    {num:14, title:'YouTube 標題+說明欄指令',
+     text:'我是 Rika，YouTube Shorts 的省錢育兒旅遊理財頻道。\n觀眾：28-45 歲台灣媽媽。\n\n幫我針對以下影片主題，產出：\n1. YouTube 標題（含 SEO 關鍵字，不超過 60 字，加數字或問句）\n2. 說明欄第一段（100字以內，含主要關鍵字）\n3. 說明欄標籤（10-15 個，繁體中文+英文混搭）\n\n影片主題：【填入主題】',
+     note:'標題是 YouTube 點閱率的關鍵'},
+    {num:15, title:'LINE 社群發文指令',
+     text:'我是 Rika，在 LINE 社群分享省錢育兒旅遊理財的實用資訊給媽媽們。\n\n幫我針對以下影片主題，寫一則 LINE 社群貼文：\n- 開頭像在群組裡跟媽媽說話\n- 直接說重點，不廢話\n- 鼓勵轉傳給需要的媽媽\n- 不超過 60 字，手機閱讀友善\n\n影片主題：【填入主題】',
+     note:'LINE 社群重視實用性，直接說重點'},
+    {num:16, title:'危禁詞檢查指令',
+     text:'幫我檢查以下文案的內容，符合 IG 和 YouTube 社群規定：\n- 替換掉危禁詞，例如：最好、第一、最便宜、百分百、保證、絕對等誇大詞\n- 保留原文核心內容，只替換違規詞\n- 替換後語意要通順自然\n- 列出替換了哪些詞和替換原因\n\n【貼上你的文案內容】',
+     note:'發布前必做！避免被平台降觸及'},
+    {num:17, title:'獲客引流文案指令',
+     text:'我是 Rika，做省錢育兒旅遊理財內容，觀眾是台灣媽媽。\n\n幫我優化以下文案，自然植入引流邏輯：\n- 不生硬，不像在賣東西\n- 勾起媽媽的需求和行動慾望\n- 引導她主動來問或追蹤\n- 保留原文核心內容，合規不違規\n\n【貼上你的文案內容】',
+     note:'適合有商業目的的影片文案'},
+    {num:18, title:'統一標籤包指令',
+     text:'我是 Rika，做省錢育兒旅遊理財短影音，觀眾是 28-45 歲台灣媽媽。\n平台：IG Reels、YouTube Shorts、Facebook。\n\n幫我針對以下影片主題，產出一組標籤包：\n- IG 標籤：20-25 個（繁體中文為主，含幾個英文，混合大中小流量）\n- YouTube 標籤：10-15 個（關鍵字為主）\n- 通用標籤：5 個（每支影片都能用的品牌標籤）\n\n影片主題：【填入主題】',
+     note:'標籤要混合大中小流量'},
+    {num:19, title:'精簡文案指令',
+     text:'幫我精簡壓縮以下文案：\n- 原意完全不變，留核心觀點\n- 保留最重要的信息點\n- 刪除重複或多餘的表達\n- 合併相似的觀點\n- 語句俐落通順，字數變少但說服力不降低\n\n目標字數：【填入目標字數】\n【貼上你的文案內容】',
+     note:'長文案壓縮成各平台適合的長度'},
+    {num:20, title:'五平台一鍵文案指令',
+     text:'我是 Rika，1寶媽，做省錢育兒旅遊理財短影音。\n說話風格：親切溫暖、直接犀利、故事感強、喜歡用數字。\n觀眾：28-45 歲台灣媽媽。\n\n影片主題：【填入主題】\n影片核心重點：【填入3個重點】\n\n請幫我一次產出五份發布文案：\n① IG 說明文字（簡短有力，150字以內，含標籤）\n② FB 說明文字（情感故事開場，100-200字）\n③ Threads 貼文（對話感，80字以內）\n④ YouTube 標題+說明欄（含SEO關鍵字）\n⑤ LINE 社群發文（直接實用，60字以內）',
+     note:'一次搞定五個平台，省最多時間'},
+  ],
+  publish: [
+    {num:22, title:'對標帳號風格分析指令',
+     text:'我想做省錢育兒旅遊理財的短影音，觀眾是 28-45 歲台灣媽媽，不露臉，說話親切直接有故事感。\n\n請幫我分析以下帳號的內容風格：\n- 他的 Hook 方式是什麼？\n- 他用什麼樣的說話節奏？\n- 他如何設計 CTA？\n- 我可以從他身上學到什麼？\n- 我跟他的差異化可以是什麼？\n\n帳號：【填入帳號名稱或影片連結】',
+     note:'分析對標帳號，找出差異化定位'},
+    {num:23, title:'反常識開場指令',
+     text:'我是 Rika，做省錢旅遊理財育兒內容。\n\n幫我針對以下主題，設計一個「反常識」的開場：\n- 說一個大多數媽媽以為對，但其實錯的觀念\n- 或說一個聽起來不可能，但其實真的有效的方法\n- 讓觀眾產生「什麼？！」的反應\n- 適合口播，不超過 20 個字\n\n主題：【填入主題】',
+     note:'反常識開場留人率最高'},
+  ]
+};
+
+var PROMPT_TABS = {
+  script:  {tabs:['全部指令'], colors:['#534AB7'], bgs:['#EEEDFE']},
+  edit:    {tabs:['優化指令'], colors:['#0F6E56'], bgs:['#E1F5EE']},
+  cover:   {tabs:['封面指令'], colors:['#BA7517'], bgs:['#FAEEDA']},
+  copy:    {tabs:['文案指令'], colors:['#993556'], bgs:['#FBEAF0']},
+  publish: {tabs:['進階指令'], colors:['#185FA5'], bgs:['#E6F1FB']}
+};
+
+var projects = [
+  {id:'a', col:'script', title:'3 個讓你睡前放鬆的方法', tags:['health','edu'], urgent:false,
+   nodes:{
+     script:{status:'active', content:'Hook（0-3秒）\n「為什麼你越累越睡不著？」\n\n分鏡 1（4-20秒）\n畫面：坐在床邊，燈光昏黃\n口播：第一個方法，手機放到另一個房間...\n\n分鏡 2（21-40秒）\n畫面：倒一杯溫水\n口播：第二個，睡前喝一杯溫水...\n\n分鏡 3（41-55秒）\n畫面：拿出筆記本\n口播：第三個，把明天三件事寫下來...\n\nCTA（56-60秒）\n試試看，留言告訴我你睡得好嗎？',
+       comments:[
+         {author:'你',text:'Hook 改成問句，用「為什麼你越累越睡不著？」',time:'10分鐘前',ai:false},
+         {author:'Claude AI',text:'已更新！新版 Hook 更有痛點感。',time:'9分鐘前',ai:true}
+       ]},
+     shoot:{status:'wait', scenes:[
+       {id:'s0',title:'Hook 開場',time:'0–3 秒',filename:'clip_01_hook',shot:'直視鏡頭，表情認真帶點疑惑',script:'「為什麼你越累越睡不著？」',done:false,note:''},
+       {id:'s1',title:'重點一：手機遠離',time:'4–20 秒',filename:'clip_02_重點1',shot:'坐在床邊，把手機放到桌子另一側',script:'第一個方法，手機放到另一個房間...',done:false,note:''},
+       {id:'s2',title:'重點二：喝溫水',time:'21–40 秒',filename:'clip_03_重點2',shot:'倒一杯溫水，鏡頭特寫水杯',script:'第二個，睡前喝一杯溫水...',done:false,note:''},
+       {id:'s3',title:'重點三：寫筆記',time:'41–55 秒',filename:'clip_04_重點3',shot:'拿出筆記本，手寫明天三件事',script:'第三個，把明天要做的三件事寫下來...',done:false,note:''},
+       {id:'s4',title:'CTA 結尾',time:'56–60 秒',filename:'clip_05_cta',shot:'微笑看鏡頭',script:'試試看，留言告訴我你睡得好嗎？',done:false,note:''}
+     ], comments:[]},
+     edit:{status:'wait', checks:[
+       {done:false,text:'匯入素材依序排列'},{done:false,text:'AI 智能剪接'},{done:false,text:'審視節奏並微調'},
+       {done:false,text:'AI 自動字幕'},{done:false,text:'BGM 配樂'},{done:false,text:'套用轉場模板'},
+       {done:false,text:'第一幀疊加大字 Hook'},{done:false,text:'完整審視確認'},{done:false,text:'匯出 1080p MP4'}
+     ], comments:[]},
+     cover:{status:'wait', content:'後製完成後，提供標題即可產出封面圖卡\n\n可選樣式：A黑底爆字 / B紫底撞色 / C白底衝擊\nD深綠反白 / E米白極簡 / F橘黃分割', comments:[]},
+     copy:{status:'wait', content:'封面確認後，自動產出以下五份文案：\n① FB 說明文字\n② IG 說明文字\n③ Threads 貼文\n④ YouTube 標題＋說明欄\n⑤ 統一標籤包', comments:[]},
+     publish:{status:'wait', checks:[
+       {done:false,text:'Claude 建議發布時間確認'},{done:false,text:'Meta Business Suite 排程 FB+IG'},
+       {done:false,text:'YouTube Studio 排程上傳'},{done:false,text:'Threads 排程發布'},
+       {done:false,text:'四平台排程全部確認完成'}
+     ], comments:[]}
+   }},
+  {id:'b', col:'shoot', title:'早起習慣養成 30 天挑戰', tags:['life'], urgent:false,
+   nodes:{
+     script:{status:'done', content:'Hook：你知道95%的人早起失敗的真正原因嗎？\n分鏡共4段，建議時長：60秒', comments:[]},
+     shoot:{status:'active', scenes:[
+       {id:'s0',title:'Hook',time:'0–5 秒',filename:'clip_01_hook',shot:'鬧鐘響，關掉',script:'你知道95%的人早起失敗的真正原因嗎？',done:true,note:'已拍完'},
+       {id:'s1',title:'原因說明',time:'6–20 秒',filename:'clip_02_原因',shot:'看著鏡頭說明',script:'第一個原因：前一天晚上沒有準備好...',done:true,note:'已拍完'},
+       {id:'s2',title:'解法',time:'21–50 秒',filename:'clip_03_解法',shot:'在桌上擺好隔天要用的東西',script:'解法很簡單，睡前把隔天的衣服準備好...',done:false,note:''},
+       {id:'s3',title:'CTA',time:'51–60 秒',filename:'clip_04_cta',shot:'微笑看鏡頭',script:'明天早起試試看！留言告訴我你成功了嗎？',done:false,note:''}
+     ], comments:[{author:'你',text:'今天下午拍 clip_03，注意窗邊光線',time:'1小時前',ai:false}]},
+     edit:{status:'wait', checks:[{done:false,text:'等拍攝完成後開始'}], comments:[]},
+     cover:{status:'wait', content:'待後製完成後產出', comments:[]},
+     copy:{status:'wait', content:'待封面確認後產出', comments:[]},
+     publish:{status:'wait', checks:[{done:false,text:'待前置步驟完成'}], comments:[]}
+   }},
+  {id:'c', col:'review', title:'理財入門：第一步該做什麼', tags:['finance','edu'], urgent:true,
+   nodes:{
+     script:{status:'done', content:'腳本已確認完成', comments:[]},
+     shoot:{status:'done', scenes:[
+       {id:'s0',title:'Hook',time:'0–5 秒',filename:'clip_01',shot:'看鏡頭',script:'你是不是每個月薪水一進來就不知道去哪了？',done:true,note:''},
+       {id:'s1',title:'問題說明',time:'6–25 秒',filename:'clip_02',shot:'手指比畫',script:'大多數人從來沒學過怎麼管錢...',done:true,note:''},
+       {id:'s2',title:'解法',time:'26–70 秒',filename:'clip_03',shot:'拿手機示範',script:'第一步，記帳...',done:true,note:''},
+       {id:'s3',title:'CTA',time:'71–90 秒',filename:'clip_04',shot:'微笑',script:'今天就開始！留言告訴我你用什麼記帳方式！',done:true,note:''}
+     ], comments:[]},
+     edit:{status:'done', checks:[{done:true,text:'後製完成，已匯出'}], comments:[]},
+     cover:{status:'review', content:'樣式 B 紫底撞色\n標題：理財第一步\n副標：你一定要知道的事\n\n⚠️ 等待確認配色',
+       comments:[
+         {author:'客戶 Amy',text:'封面顏色太深了，可以換淺色系嗎？',time:'30分鐘前',ai:false},
+         {author:'Claude AI',text:'收到！已準備樣式 E 米白極簡版本，整體更清爽。',time:'28分鐘前',ai:true}
+       ]},
+     copy:{status:'wait', content:'待封面確認後產出', comments:[]},
+     publish:{status:'wait', checks:[{done:false,text:'待前置步驟完成'}], comments:[]}
+   }},
+  {id:'d', col:'pending', title:'職場溝通技巧 Top 3', tags:['work'], urgent:false,
+   nodes:{
+     script:{status:'wait', content:'填寫主題表單後，Claude 自動產出腳本', comments:[]},
+     shoot:{status:'wait', scenes:[], comments:[]},
+     edit:{status:'wait', checks:[{done:false,text:'等拍攝完成後開始'}], comments:[]},
+     cover:{status:'wait', content:'待後製完成', comments:[]},
+     copy:{status:'wait', content:'待封面確認', comments:[]},
+     publish:{status:'wait', checks:[{done:false,text:'待前置步驟完成'}], comments:[]}
+   }},
+  {id:'e', col:'done', title:'5 分鐘冥想入門', tags:['mind'], urgent:false,
+   nodes:{
+     script:{status:'done', content:'腳本已完成並確認', comments:[]},
+     shoot:{status:'done', scenes:[
+       {id:'s0',title:'開場',time:'0–5 秒',filename:'clip_01',shot:'坐在瑜伽墊',script:'今天教你5分鐘冥想方法',done:true,note:''},
+       {id:'s1',title:'示範',time:'6–50 秒',filename:'clip_02',shot:'示範呼吸動作',script:'第一步，閉上眼睛，深呼吸...',done:true,note:''},
+       {id:'s2',title:'CTA',time:'51–60 秒',filename:'clip_03',shot:'微笑收尾',script:'試試看！留言告訴我你的感受',done:true,note:''}
+     ], comments:[]},
+     edit:{status:'done', checks:[{done:true,text:'後製全部完成'}], comments:[]},
+     cover:{status:'done', content:'封面已確認，樣式 E 米白極簡', comments:[]},
+     copy:{status:'done', content:'五平台文案已確認', comments:[]},
+     publish:{status:'done', checks:[{done:true,text:'已於週五晚上8點全平台發布完成'}], comments:[]}
+   }}
+];
+
+var openProject = null;
+var openNode = null;
+var currentFilter = 'all';
+var urgentNew = false;
+var activePromptNode = null;
+
+function getNodeDots(proj) {
+  var order = ['script','shoot','edit','cover','copy','publish'];
+  var colors = ['#534AB7','#D85A30','#0F6E56','#BA7517','#993556','#185FA5'];
+  return order.map(function(key,i) {
+    var n = proj.nodes[key];
+    if (!n) return '#E0E0E0';
+    if (n.status==='done') return '#0F6E56';
+    if (n.status==='active'||n.status==='review') return colors[i];
+    return '#E0E0E0';
+  });
+}
+function getDoneCount(proj) {
+  return ['script','shoot','edit','cover','copy','publish'].filter(function(k){ return proj.nodes[k]&&proj.nodes[k].status==='done'; }).length;
+}
+function getStatusBadge(status) {
+  var m = {done:{cls:'nb-done',label:'已完成'},active:{cls:'nb-active',label:'進行中'},wait:{cls:'nb-wait',label:'待開始'},review:{cls:'nb-review',label:'待審核'}};
+  return m[status]||m['wait'];
+}
+function renderFilters() {
+  var stages = ['all','pending','script','shoot','edit','review','schedule','done'];
+  var labels = {all:'全部',pending:'待開始',script:'腳本',shoot:'拍攝',edit:'後製',review:'待審核',schedule:'排程',done:'已發布'};
+  document.getElementById('filters').innerHTML = stages.map(function(s) {
+    var cnt = s==='all'?projects.length:projects.filter(function(p){return p.col===s;}).length;
+    if (cnt===0&&s!=='all') return '';
+    return '<button class="filter-btn'+(currentFilter===s?' active':'')+'" onclick="setFilter(\''+s+'\')">'
+      +labels[s]+'<span class="filter-count">'+cnt+'</span></button>';
+  }).join('');
+}
+function setFilter(f) { currentFilter=f; renderFilters(); renderList(); }
+function renderList() {
+  var list = document.getElementById('project-list');
+  var filtered = currentFilter==='all'?projects:projects.filter(function(p){return p.col===currentFilter;});
+  if (!filtered.length) { list.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">此分類沒有影片</div>'; updateStats(); return; }
+  list.innerHTML = filtered.map(function(p) {
+    var dots = getNodeDots(p); var done = getDoneCount(p);
+    var sc = STAGE_COLORS[p.col]||STAGE_COLORS['pending'];
+    var tagsHtml = p.tags.map(function(t){ return '<span class="pc-tag" style="background:'+TAGS[t].bg+';color:'+TAGS[t].color+'">'+TAGS[t].label+'</span>'; }).join('');
+    var dotsHtml = dots.map(function(d){ return '<div class="pb-seg" style="background:'+d+'"></div>'; }).join('');
+    return '<div class="project-card'+(p.urgent?' urgent':'')+'" onclick="openPanel(\''+p.id+'\')">'+
+      '<div class="pc-top"><div class="pc-title">'+(p.urgent?'⚠️ ':'')+p.title+'</div><div class="pc-arrow">›</div></div>'+
+      '<div class="pc-meta"><span class="pc-stage" style="background:'+sc.bg+';color:'+sc.color+'">'+sc.label+'</span>'+tagsHtml+'</div>'+
+      '<div class="pc-bar">'+dotsHtml+'<span class="pc-count">'+done+'/6</span></div></div>';
+  }).join('');
+  updateStats();
+}
+function updateStats() {
+  document.getElementById('s-total').textContent = projects.length;
+  document.getElementById('s-active').textContent = projects.filter(function(p){return p.col!=='pending'&&p.col!=='done';}).length;
+  document.getElementById('s-review').textContent = projects.filter(function(p){return p.col==='review';}).length;
+  document.getElementById('s-done').textContent = projects.filter(function(p){return p.col==='done';}).length;
+}
+function openPanel(id) {
+  openProject=id; openNode=null; activePromptNode=null;
+  var p = projects.filter(function(x){return x.id===id;})[0];
+  var sc = STAGE_COLORS[p.col]||STAGE_COLORS['pending'];
+  document.getElementById('p-title').textContent = p.title;
+  var stageEl = document.getElementById('p-stage');
+  stageEl.textContent = sc.label; stageEl.style.background = sc.bg; stageEl.style.color = sc.color;
+  renderPanelBody(p);
+  document.getElementById('panel').classList.add('on');
+  document.getElementById('overlay').classList.add('on');
+}
+
+function renderPromptSection(phKey, phColor, phBg) {
+  var list = PROMPTS[phKey];
+  if (!list || !list.length) return '';
+  var html = '<div class="prompt-section">';
+  html += '<div class="ns-label">📋 AI 指令庫</div>';
+  html += '<div class="prompt-cards">';
+  list.forEach(function(p) {
+    html += '<div class="prompt-card">';
+    html += '<div class="prompt-card-header">';
+    html += '<div class="prompt-num" style="background:'+phBg+';color:'+phColor+'">'+p.num+'</div>';
+    html += '<div class="prompt-title">'+p.title+'</div>';
+    html += '<button class="prompt-copy-btn" style="background:'+phBg+';color:'+phColor+'" onclick="copyPrompt(this, \''+encodeURIComponent(p.text)+'\')">複製</button>';
+    html += '</div>';
+    html += '<div class="prompt-body">';
+    html += '<div class="prompt-text">'+p.text+'</div>';
+    html += '<div class="prompt-note">💡 '+p.note+'</div>';
+    html += '</div></div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function copyPrompt(btn, encoded) {
+  var text = decodeURIComponent(encoded);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() { showToast(); });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast();
+  }
+  btn.textContent = '✓ 已複製';
+  setTimeout(function(){ btn.textContent = '複製'; }, 2000);
+}
+
+function showToast() {
+  var t = document.getElementById('copy-toast');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+
+function renderSceneCards(p, ph) {
+  var n = p.nodes[ph.key];
+  if (!n.scenes || !n.scenes.length) return '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">腳本產出後將自動生成分鏡卡片</div>';
+  var doneCnt = n.scenes.filter(function(s){return s.done;}).length;
+  var total = n.scenes.length;
+  var pct = total>0?Math.round(doneCnt/total*100):0;
+  var html = '<div class="ns-label">拍攝進度</div>';
+  html += '<div class="progress-detail"><div class="progress-bar-full"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+ph.color+'"></div></div>';
+  html += '<div class="progress-pct">'+pct+'%</div><div class="progress-sub">'+doneCnt+' / '+total+' 個分鏡完成</div></div>';
+  html += '<div class="ns-label">分鏡卡片</div><div class="scene-cards">';
+  n.scenes.forEach(function(sc, si) {
+    html += '<div class="scene-card'+(sc.done?' scene-done':'')+'">';
+    html += '<div class="scene-card-header"><div class="scene-num">'+(si+1)+'</div>';
+    html += '<div class="scene-title">'+sc.title+'</div><div class="scene-time">'+sc.time+'</div>';
+    if (sc.done) html += '<span class="scene-done-badge">✓ 完成</span>';
+    html += '</div><div class="scene-body">';
+    html += '<div class="scene-row"><div class="scene-info"><div class="scene-info-label">🎥 畫面說明</div><div class="scene-info-text">'+sc.shot+'</div></div>';
+    html += '<div class="scene-divider"></div>';
+    html += '<div class="scene-info"><div class="scene-info-label">🎙 口播腳本</div><div class="scene-info-text">'+sc.script+'</div></div></div>';
+    html += '<div class="scene-info-label" style="margin-top:4px">📁 檔案命名</div>';
+    html += '<div style="font-size:11px;font-family:monospace;background:var(--bg2);padding:4px 8px;border-radius:4px;color:var(--text2);margin-bottom:10px">'+sc.filename+'.mp4</div>';
+    html += '<button class="scene-check-btn'+(sc.done?' done':'')+'" onclick="toggleScene(\''+p.id+'\',\''+ph.key+'\','+si+')">';
+    html += '<div class="scene-check-icon">'+(sc.done?'✓':'')+'</div>'+(sc.done?'已拍攝完成':'標記為已拍攝')+'</button>';
+    html += '<div class="scene-notes"><div class="scene-notes-label">📝 拍攝備註</div>';
+    html += '<textarea class="scene-notes-box" placeholder="例如：光線不足，需補拍..." onchange="updateNote(\''+p.id+'\',\''+ph.key+'\','+si+',this.value)">'+sc.note+'</textarea></div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderPanelBody(p) {
+  var html = '';
+  html += '<div class="section-title">📋 快速連結</div>';
+  html += '<a class="form-banner" href="'+FORM_URLS.persona+'" target="_blank"><div class="form-banner-icon">👤</div><div class="form-banner-info"><div class="form-banner-title">人設設定表單</div><div class="form-banner-sub">第一次填寫，建立你的創作者人設卡</div></div><div class="form-banner-arrow">›</div></a>';
+  html += '<a class="form-banner" href="'+FORM_URLS.topic+'" target="_blank"><div class="form-banner-icon">🎯</div><div class="form-banner-info"><div class="form-banner-title">影片主題表單</div><div class="form-banner-sub">每次拍攝前填寫，Claude 自動產出腳本</div></div><div class="form-banner-arrow">›</div></a>';
+  html += '<div class="section-title">🗂 製作流程</div>';
+  PHASES.forEach(function(ph, i) {
+    var n = p.nodes[ph.key];
+    var isOpen = openNode===i;
+    var sb = getStatusBadge(n.status);
+    var isCurrent = n.status==='active'||n.status==='review';
+    var bodyHtml = '';
+    if (ph.key==='shoot') {
+      bodyHtml += renderSceneCards(p, ph);
+    } else {
+      if (n.checks) {
+        var dc = n.checks.filter(function(c){return c.done;}).length;
+        var tot = n.checks.length;
+        var pct = tot>0?Math.round(dc/tot*100):0;
+        bodyHtml += '<div class="ns-label">執行進度</div>';
+        bodyHtml += '<div class="progress-detail"><div class="progress-bar-full"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+ph.color+'"></div></div>';
+        bodyHtml += '<div class="progress-pct">'+pct+'%</div><div class="progress-sub">'+dc+' / '+tot+' 項完成</div></div>';
+        bodyHtml += '<div class="ns-label">執行清單</div><div class="checklist">';
+        n.checks.forEach(function(c,ci) {
+          bodyHtml += '<div class="check-item'+(c.done?' checked':'')+'" onclick="toggleCheck(\''+p.id+'\',\''+ph.key+'\','+ci+')">'+
+            '<div class="check-box'+(c.done?' on':'')+'>'+(c.done?'✓':'')+'</div>'+
+            '<span class="ci-text">'+c.text+'</span></div>';
+        });
+        bodyHtml += '</div>';
+      }
+      if (ph.key==='cover'||ph.key==='edit') {
+        bodyHtml += '<div class="ns-label">'+(ph.key==='cover'?'封面上傳':'影片上傳')+'</div>';
+        bodyHtml += '<div class="upload-area"><div class="upload-icon">📁</div><div class="upload-label">點此上傳檔案</div></div>';
+      }
+      if (n.content) {
+        bodyHtml += '<div class="ns-label">產出內容</div><div class="content-box">'+n.content+'</div>';
+      }
+    }
+    // 指令庫
+    if (PROMPTS[ph.key]) {
+      bodyHtml += renderPromptSection(ph.key, ph.color, ph.key==='script'?'#EEEDFE':ph.key==='edit'?'#E1F5EE':ph.key==='cover'?'#FAEEDA':ph.key==='copy'?'#FBEAF0':'#E6F1FB');
+    }
+    var commentsHtml = '';
+    if (n.comments&&n.comments.length) {
+      commentsHtml = n.comments.map(function(c){ return '<div class="comment '+(c.ai?'ai-c':'user-c')+'"><div class="c-author">'+c.author+'</div><div class="c-text">'+c.text+'</div><div class="c-time">'+c.time+'</div></div>'; }).join('');
+    } else { commentsHtml = '<div style="font-size:11px;color:var(--text3);padding:4px 0 8px">尚無留言</div>'; }
+    bodyHtml += '<div class="ns-label">留言與修改建議</div><div class="comments">'+commentsHtml+'</div>';
+    bodyHtml += '<div class="comment-row"><input id="ci-'+i+'" placeholder="輸入修改建議..." /><button class="send-btn" onclick="sendComment(\''+p.id+'\',\''+ph.key+'\','+i+')">送出</button></div>';
+    html += '<div class="node-card'+(isCurrent?' node-active':'')+(n.status==='done'?' node-done':'')+'" id="node-'+i+'">';
+    html += '<div class="node-header" onclick="toggleNode('+i+')">';
+    html += '<div class="node-dot" style="background:'+ph.color+'"></div>';
+    html += '<div class="node-name">'+ph.icon+' '+ph.label+'</div>';
+    html += '<span class="node-badge '+sb.cls+'">'+sb.label+'</span>';
+    html += '<span class="node-chevron'+(isOpen?' open':'')+'">›</span></div>';
+    html += '<div class="node-body'+(isOpen?' open':'')+'">'+bodyHtml+'</div></div>';
+  });
+  document.getElementById('p-body').innerHTML = html;
+}
+
+function toggleNode(i) {
+  openNode = (openNode===i)?null:i;
+  var p = projects.filter(function(x){return x.id===openProject;})[0];
+  renderPanelBody(p);
+  if (openNode!==null) { setTimeout(function(){ var el=document.getElementById('node-'+i); if(el) el.scrollIntoView({behavior:'smooth',block:'nearest'}); },100); }
+}
+function toggleScene(pid, phKey, si) {
+  var p = projects.filter(function(x){return x.id===pid;})[0];
+  p.nodes[phKey].scenes[si].done = !p.nodes[phKey].scenes[si].done;
+  var allDone = p.nodes[phKey].scenes.every(function(s){return s.done;});
+  if (allDone) p.nodes[phKey].status='done';
+  else if (p.nodes[phKey].scenes.some(function(s){return s.done;})) p.nodes[phKey].status='active';
+  renderPanelBody(p); renderList();
+}
+function updateNote(pid, phKey, si, val) {
+  var p = projects.filter(function(x){return x.id===pid;})[0];
+  p.nodes[phKey].scenes[si].note = val;
+}
+function toggleCheck(pid, phKey, ci) {
+  var p = projects.filter(function(x){return x.id===pid;})[0];
+  p.nodes[phKey].checks[ci].done = !p.nodes[phKey].checks[ci].done;
+  renderPanelBody(p); renderList();
+}
+function sendComment(pid, phKey, nodeIdx) {
+  var input = document.getElementById('ci-'+nodeIdx);
+  var text = input.value.trim();
+  if (!text) return;
+  var p = projects.filter(function(x){return x.id===pid;})[0];
+  p.nodes[phKey].comments.push({author:'你',text:text,time:'剛剛',ai:false});
+  input.value=''; renderPanelBody(p);
+  setTimeout(function(){
+    p.nodes[phKey].comments.push({author:'Claude AI',text:'收到你的修改建議！我會根據這個方向調整，請稍後查看更新內容。',time:'剛剛',ai:true});
+    renderPanelBody(p);
+  },800);
+}
+function closePanel() {
+  document.getElementById('panel').classList.remove('on');
+  document.getElementById('overlay').classList.remove('on');
+  openProject=null; openNode=null;
+}
+function openModal() { document.getElementById('modal').classList.add('on'); }
+function closeModal() {
+  document.getElementById('modal').classList.remove('on');
+  urgentNew=false; document.getElementById('urgent-toggle').classList.remove('on');
+}
+function toggleUrgent() {
+  urgentNew=!urgentNew;
+  var t=document.getElementById('urgent-toggle');
+  if(urgentNew) t.classList.add('on'); else t.classList.remove('on');
+}
+function createProject() {
+  var title=document.getElementById('new-title').value.trim();
+  if (!title){alert('請輸入影片標題');return;}
+  var tag=document.getElementById('new-tag').value;
+  var stage=document.getElementById('new-stage').value;
+  projects.unshift({
+    id:'p'+Date.now(), col:stage, title:title, tags:[tag], urgent:urgentNew,
+    nodes:{
+      script:{status:'wait',content:'填寫主題表單後，Claude 自動產出腳本',comments:[]},
+      shoot:{status:'wait',scenes:[],comments:[]},
+      edit:{status:'wait',checks:[{done:false,text:'匯入素材'},{done:false,text:'AI 剪接'},{done:false,text:'字幕生成'},{done:false,text:'BGM 配樂'},{done:false,text:'匯出 1080p'}],comments:[]},
+      cover:{status:'wait',content:'待後製完成',comments:[]},
+      copy:{status:'wait',content:'待封面確認',comments:[]},
+      publish:{status:'wait',checks:[{done:false,text:'排程 FB+IG'},{done:false,text:'排程 YouTube'},{done:false,text:'排程 Threads'}],comments:[]}
+    }
+  });
+  closeModal(); renderFilters(); renderList();
+  document.getElementById('new-title').value='';
+}
+renderFilters();
+renderList();
+</script>
+</body>
+</html>
