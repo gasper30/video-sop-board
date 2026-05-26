@@ -48,8 +48,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .pc-title{font-size:14px;font-weight:700;flex:1;line-height:1.4;cursor:pointer}
 .pc-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .pc-arrow{color:var(--text3);font-size:16px;margin-top:1px;cursor:pointer}
-.pc-delete{background:var(--orange-bg);border:none;border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0;opacity:0;transition:opacity .15s}
-.project-card:hover .pc-delete{opacity:1}
+.pc-delete{background:var(--orange-bg);border:none;border-radius:6px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;flex-shrink:0}
 .pc-meta{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap;cursor:pointer}
 .pc-stage{font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px}
 .pc-tag{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500}
@@ -93,30 +92,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .progress-bar-fill{height:100%;border-radius:4px;transition:width .3s}
 .progress-pct{font-size:13px;font-weight:700;color:var(--text)}
 .progress-sub{font-size:11px;color:var(--text3)}
-.scene-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
-.scene-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.scene-card.scene-done{opacity:.65}
-.scene-card.scene-done .scene-card-header{background:var(--green-bg)}
-.scene-card-header{background:var(--orange-bg);padding:10px 14px;display:flex;align-items:center;gap:10px}
-.scene-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.scene-card.scene-done .scene-num{background:var(--green)}
-.scene-title{font-size:13px;font-weight:700;flex:1;color:var(--text)}
-.scene-time{font-size:11px;color:var(--text3);flex-shrink:0}
-.scene-done-badge{font-size:10px;background:var(--green);color:#fff;padding:2px 8px;border-radius:10px;font-weight:500}
-.scene-body{padding:12px 14px}
-.scene-row{display:flex;gap:8px;margin-bottom:10px}
-.scene-info{flex:1}
-.scene-info-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.04em;margin-bottom:4px}
-.scene-info-text{font-size:12px;color:var(--text2);line-height:1.6}
-.scene-divider{width:1px;background:var(--border);flex-shrink:0}
-.scene-check-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);cursor:pointer;width:100%;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);transition:all .15s}
-.scene-check-btn.done{border-color:var(--green);background:var(--green-bg);color:var(--green)}
-.scene-check-icon{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
-.scene-check-btn.done .scene-check-icon{background:var(--green);border-color:var(--green);color:#fff}
-.scene-notes{margin-top:8px}
-.scene-notes-label{font-size:10px;color:var(--text3);margin-bottom:4px}
-.scene-notes-box{width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:inherit;color:var(--text);background:var(--bg3);resize:none;outline:none;min-height:50px}
-.scene-notes-box:focus{border-color:var(--orange)}
 .checklist{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
 .check-item{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:var(--r-sm);cursor:pointer;background:var(--bg3);border:1px solid var(--border)}
 .check-item:active{background:var(--bg2)}
@@ -141,17 +116,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .comment-row input{flex:1;font-size:13px;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--bg3);color:var(--text);font-family:inherit;outline:none}
 .comment-row input:focus{border-color:var(--purple)}
 .send-btn{background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);padding:10px 14px;font-size:13px;cursor:pointer;font-family:inherit}
-.prompt-section{margin-bottom:12px}
-.prompt-cards{display:flex;flex-direction:column;gap:8px}
-.prompt-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
-.prompt-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px}
-.prompt-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
-.prompt-title{font-size:12px;font-weight:600;flex:1;color:var(--text)}
-.prompt-copy-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;font-family:inherit;font-weight:500;flex-shrink:0}
-.prompt-body{padding:10px 12px;border-top:1px solid var(--border);background:var(--bg)}
-.prompt-text{font-size:11px;color:var(--text2);line-height:1.7;white-space:pre-wrap;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px;margin-bottom:8px;max-height:200px;overflow-y:auto}
-.prompt-note{font-size:11px;color:var(--purple);background:var(--purple-bg);padding:6px 10px;border-radius:var(--r-sm)}
-.copy-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;z-index:100;opacity:0;transition:opacity .3s;pointer-events:none}
+.copy-toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1A1A1A;color:#fff;padding:8px 20px;border-radius:20px;font-size:13px;z-index:100;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .copy-toast.show{opacity:1}
 .loading-screen{position:fixed;inset:0;background:var(--bg3);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;gap:16px}
 .loading-logo{width:56px;height:56px;background:var(--purple);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px}
@@ -204,7 +169,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .ob-saving{text-align:center;padding:60px 24px;display:flex;flex-direction:column;align-items:center;gap:16px}
 .ob-saving-spinner{width:32px;height:32px;border:3px solid var(--purple-bg);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
 .persona-btn{background:var(--purple-bg);border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:var(--purple);cursor:pointer;font-family:inherit}
-/* 刪除確認 modal */
+/* 確認刪除 modal */
 .confirm-modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:24px}
 .confirm-modal.on{display:flex}
 .confirm-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5)}
@@ -215,14 +180,84 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .confirm-btns{display:flex;gap:10px}
 .confirm-cancel{flex:1;padding:12px;background:var(--bg2);border:none;border-radius:var(--r-sm);font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;font-family:inherit}
 .confirm-ok{flex:1;padding:12px;background:var(--orange);border:none;border-radius:var(--r-sm);font-size:14px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit}
+
+/* ===== 腳本分鏡卡片 ===== */
+.script-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.copy-all-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+.raw-toggle{padding:8px 12px;background:var(--bg2);color:var(--text2);border:none;border-radius:var(--r-sm);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+.raw-toggle.on{background:var(--purple-bg);color:var(--purple)}
+
+/* 時間軸 */
+.script-timeline{display:flex;align-items:center;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.script-timeline::-webkit-scrollbar{display:none}
+.tl-node{display:flex;flex-direction:column;align-items:center;flex-shrink:0;cursor:pointer}
+.tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px currentColor;flex-shrink:0;transition:transform .15s}
+.tl-node:hover .tl-dot{transform:scale(1.3)}
+.tl-label{font-size:9px;font-weight:700;margin-top:4px;white-space:nowrap;color:var(--text3)}
+.tl-time{font-size:8px;color:var(--text3);margin-top:1px;white-space:nowrap}
+.tl-line{flex:1;height:2px;background:var(--border2);min-width:16px;flex-shrink:0;margin-bottom:20px}
+
+/* 分鏡卡片 */
+.scene-cards-wrap{display:flex;flex-direction:column;gap:10px}
+.scard{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.scard-header{display:flex;align-items:center;gap:10px;padding:10px 14px}
+.scard-num{width:26px;height:26px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.scard-title{font-size:13px;font-weight:700;flex:1}
+.scard-time{font-size:10px;color:var(--text3);flex-shrink:0}
+.scard-opt-btn{background:transparent;border:none;font-size:18px;cursor:pointer;padding:2px 4px;border-radius:6px;transition:background .15s;flex-shrink:0}
+.scard-opt-btn:hover{background:var(--bg2)}
+.scard-body{border-top:1px solid var(--border);padding:12px 14px;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.scard-row{display:flex;flex-direction:column;gap:4px}
+.scard-row-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.04em}
+.scard-row-text{font-size:12px;color:var(--text2);line-height:1.7}
+
+/* 優化選單 bottom sheet */
+.opt-sheet{position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center}
+.opt-sheet.on{display:flex}
+.opt-sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,0.4)}
+.opt-sheet-box{position:relative;background:var(--bg3);border-radius:20px 20px 0 0;padding:20px 18px 40px;width:100%;max-width:480px}
+.opt-sheet-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.opt-sheet-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.opt-list{display:flex;flex-direction:column;gap:8px}
+.opt-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;background:var(--bg);transition:all .15s}
+.opt-item:active{background:var(--bg2)}
+.opt-item-icon{font-size:20px;flex-shrink:0}
+.opt-item-text{font-size:13px;font-weight:500;color:var(--text)}
+.opt-item-hint{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* 場景卡（拍攝用） */
+.scene-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.scene-card.scene-done{opacity:.65}
+.scene-card.scene-done .scene-card-header{background:var(--green-bg)}
+.scene-card-header{background:var(--orange-bg);padding:10px 14px;display:flex;align-items:center;gap:10px}
+.scene-num{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.scene-card.scene-done .scene-num{background:var(--green)}
+.scene-title-tx{font-size:13px;font-weight:700;flex:1;color:var(--text)}
+.scene-time-tx{font-size:11px;color:var(--text3);flex-shrink:0}
+.scene-done-badge{font-size:10px;background:var(--green);color:#fff;padding:2px 8px;border-radius:10px;font-weight:500}
+.scene-body{padding:12px 14px}
+.scene-row{display:flex;gap:8px;margin-bottom:10px}
+.scene-info{flex:1}
+.scene-info-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.04em;margin-bottom:4px}
+.scene-info-text{font-size:12px;color:var(--text2);line-height:1.6}
+.scene-divider{width:1px;background:var(--border);flex-shrink:0}
+.scene-check-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);cursor:pointer;width:100%;font-family:inherit;font-size:12px;font-weight:500;color:var(--text2);transition:all .15s}
+.scene-check-btn.done{border-color:var(--green);background:var(--green-bg);color:var(--green)}
+.scene-check-icon{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.scene-check-btn.done .scene-check-icon{background:var(--green);border-color:var(--green);color:#fff}
+.scene-notes{margin-top:8px}
+.scene-notes-label{font-size:10px;color:var(--text3);margin-bottom:4px}
+.scene-notes-box{width:100%;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:12px;font-family:inherit;color:var(--text);background:var(--bg3);resize:none;outline:none;min-height:50px}
+.scene-notes-box:focus{border-color:var(--orange)}
+
 @media(min-width:640px){
-  .panel{left:auto;right:0;width:440px;border-left:1px solid var(--border)}
+  .panel{left:auto;right:0;width:480px;border-left:1px solid var(--border)}
   .fab{bottom:30px;right:30px}
   .scene-row{flex-direction:row}
-  .pc-delete{opacity:0}
-  .project-card:hover .pc-delete{opacity:1}
+  .scard-body{flex-direction:row;gap:0}
+  .scard-row{flex:1}
+  .scard-row+.scard-row{border-left:1px solid var(--border);padding-left:14px;margin-left:14px}
 }
-/* 手機上永遠顯示刪除鈕 */
 @media(max-width:639px){
   .pc-delete{opacity:1}
 }
@@ -258,6 +293,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 <div class="filters" id="filters"></div>
 <div class="project-list" id="project-list"></div>
 <button class="fab" onclick="openModal()">＋</button>
+
 <div class="overlay" id="overlay" onclick="closePanel()"></div>
 <div class="panel" id="panel">
   <div class="panel-header">
@@ -277,10 +313,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
     <button class="modal-close" onclick="closeModal()">✕</button>
     <div class="modal-title">✨ 新增影片專案</div>
     <div class="modal-sub">填完後 AI 自動產出腳本，約 30 秒</div>
-    <div class="generating-bar" id="gen-bar">
-      <div class="gen-spinner"></div>
-      <span>AI 正在產出腳本，請稍候...</span>
-    </div>
+    <div class="generating-bar" id="gen-bar"><div class="gen-spinner"></div><span>AI 正在產出腳本，請稍候...</span></div>
     <label class="form-label">影片主題 *</label>
     <input class="form-input" id="new-title" placeholder="例如：省下一半停車費的方法，我試了三個月" />
     <label class="form-label">3 個核心重點 *</label>
@@ -323,7 +356,17 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
-<div class="copy-toast" id="copy-toast">✅ 已複製！貼給 Claude 使用</div>
+<!-- 優化選單 bottom sheet -->
+<div class="opt-sheet" id="opt-sheet">
+  <div class="opt-sheet-bg" onclick="closeOptSheet()"></div>
+  <div class="opt-sheet-box">
+    <div class="opt-sheet-title">這段可以怎麼優化？</div>
+    <div class="opt-sheet-sub" id="opt-sheet-sub">選一個方向，複製後貼給 Claude</div>
+    <div class="opt-list" id="opt-list"></div>
+  </div>
+</div>
+
+<div class="copy-toast" id="copy-toast">✅ 已複製！</div>
 
 <script>
 var SUPABASE_URL = 'https://hehezmuxbywvccbozawx.supabase.co';
@@ -352,13 +395,12 @@ async function loadUser(id) {
 }
 async function saveUser(userData) {
   var res = await sbFetch('/users', { method:'POST', body:JSON.stringify(userData) });
-  if (!res.ok) { console.error('Save user failed', await res.text()); return null; }
+  if (!res.ok) return null;
   var data = await res.json();
   return Array.isArray(data) ? data[0] : data;
 }
 async function updateUser(id, fields) {
-  var res = await sbFetch('/users?id=eq.' + id, { method:'PATCH', body:JSON.stringify(fields) });
-  if (!res.ok) console.error('Update user failed', await res.text());
+  await sbFetch('/users?id=eq.' + id, { method:'PATCH', body:JSON.stringify(fields) });
 }
 
 var obStep = 1;
@@ -377,47 +419,19 @@ function showOnboarding(isEdit) {
   document.getElementById('onboard-screen').classList.add('on');
   renderObStep();
 }
-
 function renderObStep() {
   var inner = document.getElementById('onboard-inner');
   var stepsHtml = [1,2,3].map(function(i){ return '<div class="onboard-step'+(i<=obStep?' on':'')+'"></div>'; }).join('');
   if (obStep === 1) {
-    inner.innerHTML =
-      '<div class="onboard-steps">'+stepsHtml+'</div>'+
-      '<div class="onboard-title">告訴我你是誰 👋</div>'+
-      '<div class="onboard-sub">之後產出的每份腳本，都會完全符合你的風格。</div>'+
-      '<label class="ob-label">你的名字或頻道名稱</label>'+
-      '<input class="ob-input" id="ob-name" placeholder="例如：Rika" value="'+obData.name+'" />'+
-      '<label class="ob-label">內容領域（可複選）</label>'+
-      '<div class="ob-chips">'+TOPICS.map(function(t){ return '<button class="ob-chip'+(obData.topics.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'topics\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div>'+
-      '<button class="ob-next" onclick="obNext1()">下一步 →</button>'+
-      '<button class="ob-skip" onclick="obSkipAll()">暫時跳過</button>';
+    inner.innerHTML = '<div class="onboard-steps">'+stepsHtml+'</div><div class="onboard-title">告訴我你是誰 👋</div><div class="onboard-sub">之後產出的每份腳本，都會完全符合你的風格。</div><label class="ob-label">你的名字或頻道名稱</label><input class="ob-input" id="ob-name" placeholder="例如：Rika" value="'+obData.name+'" /><label class="ob-label">內容領域（可複選）</label><div class="ob-chips">'+TOPICS.map(function(t){ return '<button class="ob-chip'+(obData.topics.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'topics\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div><button class="ob-next" onclick="obNext1()">下一步 →</button><button class="ob-skip" onclick="obSkipAll()">暫時跳過</button>';
   } else if (obStep === 2) {
-    inner.innerHTML =
-      '<div class="onboard-steps">'+stepsHtml+'</div>'+
-      '<div class="onboard-title">你的說話風格 🎙</div>'+
-      '<div class="onboard-sub">AI 會用這個風格幫你寫腳本。</div>'+
-      '<label class="ob-label">說話風格（可複選）</label>'+
-      '<div class="ob-chips">'+STYLES.map(function(t){ return '<button class="ob-chip'+(obData.style.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'style\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div>'+
-      '<label class="ob-label">目標觀眾</label>'+
-      '<input class="ob-input" id="ob-audience" placeholder="例如：28-45 歲台灣媽媽" value="'+obData.audience+'" />'+
-      '<label class="ob-label">發布平台（可複選）</label>'+
-      '<div class="ob-chips">'+PLATFORMS.map(function(t){ return '<button class="ob-chip'+(obData.platforms.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'platforms\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div>'+
-      '<button class="ob-next" onclick="obNext2()">下一步 →</button>';
+    inner.innerHTML = '<div class="onboard-steps">'+stepsHtml+'</div><div class="onboard-title">你的說話風格 🎙</div><div class="onboard-sub">AI 會用這個風格幫你寫腳本。</div><label class="ob-label">說話風格（可複選）</label><div class="ob-chips">'+STYLES.map(function(t){ return '<button class="ob-chip'+(obData.style.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'style\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div><label class="ob-label">目標觀眾</label><input class="ob-input" id="ob-audience" placeholder="例如：28-45 歲台灣媽媽" value="'+obData.audience+'" /><label class="ob-label">發布平台（可複選）</label><div class="ob-chips">'+PLATFORMS.map(function(t){ return '<button class="ob-chip'+(obData.platforms.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'platforms\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div><button class="ob-next" onclick="obNext2()">下一步 →</button>';
   } else if (obStep === 3) {
-    inner.innerHTML =
-      '<div class="onboard-steps">'+stepsHtml+'</div>'+
-      '<div class="onboard-title">最後一步 ✨</div>'+
-      '<div class="onboard-sub">告訴 AI 什麼話題絕對不能碰。</div>'+
-      '<label class="ob-label">絕對不談的話題</label>'+
-      '<textarea class="ob-textarea" id="ob-never" placeholder="例如：政治、宗教、競品比較、特定股票建議">'+obData.never_cover+'</textarea>'+
-      '<button class="ob-next" onclick="obFinish()">完成設定 🎉</button>';
+    inner.innerHTML = '<div class="onboard-steps">'+stepsHtml+'</div><div class="onboard-title">最後一步 ✨</div><div class="onboard-sub">告訴 AI 什麼話題絕對不能碰。</div><label class="ob-label">絕對不談的話題</label><textarea class="ob-textarea" id="ob-never" placeholder="例如：政治、宗教、競品比較、特定股票建議">'+obData.never_cover+'</textarea><button class="ob-next" onclick="obFinish()">完成設定 🎉</button>';
   }
 }
-
 function obToggle(btn, field, val) {
-  var arr = obData[field];
-  var idx = arr.indexOf(val);
+  var arr = obData[field]; var idx = arr.indexOf(val);
   if (idx > -1) { arr.splice(idx, 1); btn.classList.remove('on'); }
   else { arr.push(val); btn.classList.add('on'); }
 }
@@ -433,7 +447,7 @@ function obNext2() {
 async function obFinish() {
   obData.never_cover = document.getElementById('ob-never').value.trim();
   var inner = document.getElementById('onboard-inner');
-  inner.innerHTML = '<div class="ob-saving"><div class="ob-saving-spinner"></div><div style="font-size:16px;font-weight:700;color:var(--text)">儲存中...</div></div>';
+  inner.innerHTML = '<div class="ob-saving"><div class="ob-saving-spinner"></div><div style="font-size:16px;font-weight:700">儲存中...</div></div>';
   var existingId = getUserId();
   if (existingId && currentUser) {
     await updateUser(existingId, { name:obData.name, topics:obData.topics, style:obData.style, audience:obData.audience, never_cover:obData.never_cover, platforms:obData.platforms, updated_at:new Date().toISOString() });
@@ -474,13 +488,12 @@ async function dbGetAll() {
 }
 async function dbInsert(proj) {
   var res = await sbFetch('/projects', { method:'POST', body:JSON.stringify(proj) });
-  if (!res.ok) { console.error('Insert failed', await res.text()); return null; }
+  if (!res.ok) return null;
   var data = await res.json();
   return Array.isArray(data) ? data[0] : data;
 }
 async function dbUpdate(id, fields) {
-  var res = await sbFetch('/projects?id=eq.'+id, { method:'PATCH', body:JSON.stringify(fields) });
-  if (!res.ok) console.error('Update failed', await res.text());
+  await sbFetch('/projects?id=eq.'+id, { method:'PATCH', body:JSON.stringify(fields) });
 }
 async function dbDelete(id) {
   await sbFetch('/projects?id=eq.'+id, { method:'DELETE' });
@@ -495,41 +508,276 @@ var PHASES = [
   {key:'publish',label:'排程發布', color:'#185FA5', icon:'🚀'}
 ];
 var STAGE_COLORS = {
-  pending:  {bg:'#F1EFE8',color:'#888780',label:'待開始'},
-  script:   {bg:'#EEEDFE',color:'#534AB7',label:'腳本產出'},
-  shoot:    {bg:'#FAECE7',color:'#D85A30',label:'拍攝中'},
-  edit:     {bg:'#E1F5EE',color:'#0F6E56',label:'後製中'},
-  review:   {bg:'#FAEEDA',color:'#BA7517',label:'待審核'},
-  schedule: {bg:'#E6F1FB',color:'#185FA5',label:'排程發布'},
-  done:     {bg:'#EAF3DE',color:'#3B6D11',label:'已發布'}
+  pending:{bg:'#F1EFE8',color:'#888780',label:'待開始'},
+  script:{bg:'#EEEDFE',color:'#534AB7',label:'腳本產出'},
+  shoot:{bg:'#FAECE7',color:'#D85A30',label:'拍攝中'},
+  edit:{bg:'#E1F5EE',color:'#0F6E56',label:'後製中'},
+  review:{bg:'#FAEEDA',color:'#BA7517',label:'待審核'},
+  schedule:{bg:'#E6F1FB',color:'#185FA5',label:'排程發布'},
+  done:{bg:'#EAF3DE',color:'#3B6D11',label:'已發布'}
 };
 var TAGS = {
   health:{label:'健康',bg:'#E1F5EE',color:'#085041'},
-  life:  {label:'生活',bg:'#FAEEDA',color:'#633806'},
+  life:{label:'生活',bg:'#FAEEDA',color:'#633806'},
   finance:{label:'理財',bg:'#E6F1FB',color:'#0C447C'},
-  work:  {label:'職場',bg:'#F1EFE8',color:'#444441'},
-  mind:  {label:'身心靈',bg:'#EEEDFE',color:'#3C3489'},
-  edu:   {label:'教學',bg:'#EAF3DE',color:'#3B6D11'}
+  work:{label:'職場',bg:'#F1EFE8',color:'#444441'},
+  mind:{label:'身心靈',bg:'#EEEDFE',color:'#3C3489'},
+  edu:{label:'教學',bg:'#EAF3DE',color:'#3B6D11'}
 };
-var PROMPTS = {
-  script:[
-    {num:1,title:'人性化口語指令',text:'請把以下腳本改得更口語化：\n- 文字白話，像在跟朋友聊天\n- 避免過於機器化的段落結構\n- 保留核心重點，不改變意思\n\n【貼上你的腳本內容】',note:'貼上腳本後直接使用'},
-    {num:2,title:'Hook 開頭留住人指令',text:'把以下腳本的開頭改成短影音爆款 Hook：\n- 前三秒要抓住眼球\n- 節奏快、不拖沓\n- 只優化開頭，後半段不動\n\n【貼上你的腳本開頭】',note:'專門用來優化 Hook'},
-    {num:3,title:'提高完播率指令',text:'把以下腳本優化得更生動，提高完播率：\n- 有畫面感，增加氛圍感描寫\n- 讀起來身歷其境、情緒飽滿\n- 保留原意不改核心內容\n\n【貼上你的腳本內容】',note:'提高觀眾看完整支影片的機率'},
-  ],
-  edit:[
-    {num:21,title:'爆款標題優化指令',text:'幫我針對以下主題，產出 5 個爆款標題：\n- 數字型、反問型、痛點型、懸念型、故事型各一\n\n主題：【填入主題】',note:'5個方向選最有感的一個'},
-  ],
-  cover:[
-    {num:27,title:'封面圖卡標題指令',text:'幫我產出封面圖卡文字：\n- 大標題（6字以內，衝擊感強）\n- 副標題（一句話說清楚）\n\n影片主題：【填入主題】',note:'大標題6字以內才能一秒被看到'},
-  ],
-  copy:[
-    {num:20,title:'五平台一鍵文案指令',text:'影片主題：【填入主題】\n影片核心重點：【填入3個重點】\n\n請一次產出五份發布文案：\n① IG 說明文字（150字以內，含標籤）\n② FB 說明文字（情感故事開場，100-200字）\n③ Threads 貼文（對話感，80字以內）\n④ YouTube 標題+說明欄（含SEO）\n⑤ LINE 社群發文（直接實用，60字以內）',note:'一次搞定五個平台，省最多時間'},
-  ],
-  publish:[
-    {num:22,title:'對標帳號分析指令',text:'請幫我分析以下帳號：\n- Hook 方式是什麼？\n- 說話節奏如何？\n- 我能學到什麼？\n- 我的差異化可以是什麼？\n\n帳號：【填入帳號名稱】',note:'分析對標帳號，找出差異化定位'},
-  ]
-};
+
+// ===== 腳本解析 =====
+var SEG_COLORS = ['#534AB7','#D85A30','#0F6E56','#BA7517','#993556','#185FA5'];
+
+function parseScript(rawText) {
+  if (!rawText || rawText === 'AI 正在產出腳本，請稍候...') return null;
+  var segments = [];
+  // 切段：以【開頭
+  var parts = rawText.split(/(?=【)/);
+  parts.forEach(function(part, i) {
+    part = part.trim();
+    if (!part) return;
+    var headerMatch = part.match(/【([^】]+)】/);
+    if (!headerMatch) return;
+    var header = headerMatch[1];
+    // 從標題抓時間（例：0–3秒、3–20秒）
+    var timeMatch = header.match(/([\d０-９]+[–\-~～到至][\d０-９]+\s*秒|最後\s*[\d０-９]+\s*秒|前\s*[\d０-９]+\s*秒)/);
+    var timeRange = timeMatch ? timeMatch[0] : '';
+    // 清理標題
+    var cleanTitle = header.replace(/\s*([\d０-９]+[–\-~～到至][\d０-９]+\s*秒|最後\s*[\d０-９]+\s*秒|前\s*[\d０-９]+\s*秒)\s*/g,'').trim();
+    if (!cleanTitle) cleanTitle = '段落 '+(i+1);
+    // 抓畫面和口播
+    var body = part.replace(/【[^】]+】/,'').trim();
+    var visualMatch = body.match(/(?:畫面|鏡頭)[：:]\s*([^\n口播]+)/);
+    var scriptMatch = body.match(/(?:口播|文案|台詞)[：:]\s*([^\n畫面鏡頭]+)/);
+    var visual = visualMatch ? visualMatch[1].trim() : '';
+    var script = scriptMatch ? scriptMatch[1].trim() : body.replace(/(?:畫面|鏡頭)[：:].*\n?/,'').replace(/(?:口播|文案|台詞)[：:]/,'').trim();
+    if (!visual && !script) { script = body; }
+    segments.push({
+      index: i+1,
+      title: cleanTitle,
+      timeRange: timeRange,
+      visual: visual,
+      script: script,
+      color: SEG_COLORS[i % SEG_COLORS.length]
+    });
+  });
+  return segments.length ? segments : null;
+}
+
+// ===== 優化選單 =====
+var OPT_ACTIONS = [
+  {
+    icon:'🗣',
+    text:'讓這段更口語化',
+    hint:'像在跟朋友聊天',
+    isHook: false,
+    prompt: function(seg) {
+      return '請把以下腳本改得更口語化：\n- 文字白話，像在跟朋友聊天\n- 避免過於機器化的段落結構\n- 保留核心重點，不改變意思\n\n以下是這段內容：\n'+seg.script;
+    }
+  },
+  {
+    icon:'⚡',
+    text:'加強開場吸引力',
+    hint:'只在 Hook 段落使用',
+    isHook: true,
+    prompt: function(seg) {
+      return '把以下腳本的開頭改成短影音爆款 Hook：\n- 前三秒要抓住眼球\n- 節奏快、不拖沓\n- 只優化開頭，後半段不動\n\n以下是這段內容：\n'+seg.script;
+    }
+  },
+  {
+    icon:'✂️',
+    text:'這段太長，幫我縮短',
+    hint:'保留最核心一個重點',
+    isHook: false,
+    prompt: function(seg) {
+      return '把以下這段腳本縮短到一半以內：\n- 保留最核心的一個重點\n- 刪除重複或不必要的說明\n- 維持原本的語氣風格\n\n以下是這段內容：\n'+seg.script;
+    }
+  },
+  {
+    icon:'😄',
+    text:'加點幽默感',
+    hint:'輕鬆比喻或自嘲',
+    isHook: false,
+    prompt: function(seg) {
+      return '幫以下這段腳本加入幽默感：\n- 可以加一個輕鬆的比喻或自嘲\n- 不要讓人覺得刻意搞笑\n- 保留原本要傳達的重點\n\n以下是這段內容：\n'+seg.script;
+    }
+  },
+  {
+    icon:'💥',
+    text:'讓情緒更強烈',
+    hint:'加強衝擊力和緊迫感',
+    isHook: false,
+    prompt: function(seg) {
+      return '把以下腳本的情緒強度提高：\n- 用詞更有衝擊力\n- 加強畫面感和緊迫感\n- 讓觀眾感覺跟自己有關\n\n以下是這段內容：\n'+seg.script;
+    }
+  }
+];
+
+var currentOptSeg = null;
+var rawScriptMode = false;
+
+function openOptSheet(segIdx, segments) {
+  currentOptSeg = segments[segIdx];
+  var isHookSeg = currentOptSeg.title.toLowerCase().indexOf('hook') > -1 || segIdx === 0;
+  document.getElementById('opt-sheet-sub').textContent = '「' + currentOptSeg.title + '」段落';
+  var list = document.getElementById('opt-list');
+  list.innerHTML = OPT_ACTIONS
+    .filter(function(a){ return !a.isHook || isHookSeg; })
+    .map(function(a, i) {
+      return '<div class="opt-item" onclick="copyOpt('+i+','+segIdx+','+JSON.stringify(segments).split('"').join('&quot;')+'_SKIP)">'
+        + '<div class="opt-item-icon">'+a.icon+'</div>'
+        + '<div><div class="opt-item-text">'+a.text+'</div><div class="opt-item-hint">'+a.hint+'</div></div>'
+        + '</div>';
+    }).join('');
+  // rebuild with proper data reference
+  list.innerHTML = OPT_ACTIONS
+    .filter(function(a){ return !a.isHook || isHookSeg; })
+    .map(function(a, i) {
+      return '<div class="opt-item" id="optitem-'+i+'">'
+        + '<div class="opt-item-icon">'+a.icon+'</div>'
+        + '<div><div class="opt-item-text">'+a.text+'</div><div class="opt-item-hint">'+a.hint+'</div></div>'
+        + '</div>';
+    }).join('');
+  // bind click with closure
+  var filteredActions = OPT_ACTIONS.filter(function(a){ return !a.isHook || isHookSeg; });
+  filteredActions.forEach(function(a, i) {
+    var el = document.getElementById('optitem-'+i);
+    if (el) el.onclick = function() {
+      var text = a.prompt(currentOptSeg);
+      copyText(text, '✅ 已複製！貼給 Claude 優化這段');
+      closeOptSheet();
+    };
+  });
+  document.getElementById('opt-sheet').classList.add('on');
+}
+function closeOptSheet() {
+  document.getElementById('opt-sheet').classList.remove('on');
+  currentOptSeg = null;
+}
+
+function copyText(text, msg) {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function(){ showToast(msg); });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast(msg);
+  }
+}
+
+// ===== 腳本節點渲染 =====
+function renderScriptNode(p) {
+  var n = p.nodes.script;
+  var content = n.content || '';
+  var isGenerating = content === 'AI 正在產出腳本，請稍候...';
+  var segments = isGenerating ? null : parseScript(content);
+
+  var html = '';
+
+  if (isGenerating) {
+    html += '<div style="text-align:center;padding:24px;color:var(--purple)"><div class="gen-spinner" style="margin:0 auto 10px"></div><div style="font-size:13px;font-weight:600">AI 正在產出腳本，請稍候...</div></div>';
+  } else if (segments) {
+    // 頂部工具列
+    html += '<div class="script-toolbar">';
+    html += '<button class="copy-all-btn" onclick="copyAllScript(\''+encodeURIComponent(content)+'\')">📋 複製完整腳本</button>';
+    html += '<button class="raw-toggle'+(rawScriptMode?' on':'')+'" onclick="toggleRawScript()">原始文字</button>';
+    html += '</div>';
+
+    if (rawScriptMode) {
+      html += '<div class="content-box">'+content+'</div>';
+    } else {
+      // 時間軸
+      html += '<div class="script-timeline">';
+      segments.forEach(function(seg, i) {
+        if (i > 0) html += '<div class="tl-line"></div>';
+        html += '<div class="tl-node"><div class="tl-dot" style="color:'+seg.color+';background:'+seg.color+'"></div><div class="tl-label" style="color:'+seg.color+'">'+seg.title+'</div>'+(seg.timeRange?'<div class="tl-time">'+seg.timeRange+'</div>':'')+'</div>';
+      });
+      html += '</div>';
+
+      // 分鏡卡片
+      html += '<div class="scene-cards-wrap" id="scards-'+p.id+'">';
+      segments.forEach(function(seg, i) {
+        html += '<div class="scard">';
+        html += '<div class="scard-header" style="background:'+seg.color+'18;border-bottom:1px solid '+seg.color+'30">';
+        html += '<div class="scard-num" style="background:'+seg.color+'">'+seg.index+'</div>';
+        html += '<div class="scard-title" style="color:'+seg.color+'">'+seg.title+'</div>';
+        if (seg.timeRange) html += '<div class="scard-time">'+seg.timeRange+'</div>';
+        html += '<button class="scard-opt-btn" id="optbtn-'+p.id+'-'+i+'" title="優化這段">✨</button>';
+        html += '</div>';
+        html += '<div class="scard-body">';
+        if (seg.visual) {
+          html += '<div class="scard-row"><div class="scard-row-label">🎥 畫面說明</div><div class="scard-row-text">'+seg.visual+'</div></div>';
+        }
+        if (seg.script) {
+          html += '<div class="scard-row"><div class="scard-row-label">🎙 口播腳本</div><div class="scard-row-text">'+seg.script+'</div></div>';
+        }
+        html += '</div></div>';
+      });
+      html += '</div>';
+
+      // 綁定✨按鈕（用 setTimeout 確保 DOM ready）
+      setTimeout(function() {
+        segments.forEach(function(seg, i) {
+          var btn = document.getElementById('optbtn-'+p.id+'-'+i);
+          if (btn) btn.onclick = function(e) {
+            e.stopPropagation();
+            openOptSheet(i, segments);
+          };
+        });
+      }, 50);
+    }
+  } else {
+    // 無法解析，fallback 純文字
+    html += '<div class="script-toolbar"><button class="copy-all-btn" onclick="copyAllScript(\''+encodeURIComponent(content)+'\')">📋 複製完整腳本</button></div>';
+    html += '<div class="content-box">'+content+'</div>';
+  }
+
+  // 留言區
+  var commentsHtml = '';
+  if (n.comments && n.comments.length) {
+    commentsHtml = n.comments.map(function(c){ return '<div class="comment '+(c.ai?'ai-c':'user-c')+'"><div class="c-author">'+c.author+'</div><div class="c-text">'+c.text+'</div><div class="c-time">'+c.time+'</div></div>'; }).join('');
+  } else {
+    commentsHtml = '<div style="font-size:11px;color:var(--text3);padding:4px 0 8px">尚無留言</div>';
+  }
+  html += '<div class="ns-label" style="margin-top:14px">留言與修改建議</div><div class="comments">'+commentsHtml+'</div>';
+  html += '<div class="comment-row"><input id="ci-script" placeholder="輸入修改建議..." /><button class="send-btn" onclick="sendComment(\''+p.id+'\',\'script\',\'script\')">送出</button></div>';
+
+  return html;
+}
+
+function copyAllScript(encoded) {
+  var text = decodeURIComponent(encoded);
+  copyText(text, '📋 完整腳本已複製！');
+}
+
+function toggleRawScript() {
+  rawScriptMode = !rawScriptMode;
+  if (openProject) {
+    var p = projects.filter(function(x){ return x.id === openProject; })[0];
+    if (p) renderPanelBody(p);
+  }
+}
+
+// ===== 拍攝場景卡 =====
+function renderSceneCards(p, ph) {
+  var n = p.nodes[ph.key];
+  if (!n.scenes || !n.scenes.length) return '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">腳本產出後將自動生成分鏡卡片</div>';
+  var doneCnt = n.scenes.filter(function(s){return s.done;}).length;
+  var total = n.scenes.length;
+  var pct = total>0?Math.round(doneCnt/total*100):0;
+  var html = '<div class="ns-label">拍攝進度</div>';
+  html += '<div class="progress-detail"><div class="progress-bar-full"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+ph.color+'"></div></div><div class="progress-pct">'+pct+'%</div><div class="progress-sub">'+doneCnt+' / '+total+' 個分鏡完成</div></div>';
+  html += '<div class="ns-label">分鏡卡片</div>';
+  n.scenes.forEach(function(sc,si) {
+    html += '<div class="scene-card'+(sc.done?' scene-done':'')+'">';
+    html += '<div class="scene-card-header"><div class="scene-num">'+(si+1)+'</div><div class="scene-title-tx">'+sc.title+'</div><div class="scene-time-tx">'+sc.time+'</div>'+(sc.done?'<span class="scene-done-badge">✓ 完成</span>':'')+'</div>';
+    html += '<div class="scene-body"><div class="scene-row"><div class="scene-info"><div class="scene-info-label">🎥 畫面說明</div><div class="scene-info-text">'+sc.shot+'</div></div><div class="scene-divider"></div><div class="scene-info"><div class="scene-info-label">🎙 口播腳本</div><div class="scene-info-text">'+sc.script+'</div></div></div>';
+    html += '<button class="scene-check-btn'+(sc.done?' done':'')+'" onclick="toggleScene(\''+p.id+'\',\''+ph.key+'\','+si+')"><div class="scene-check-icon">'+(sc.done?'✓':'')+'</div>'+(sc.done?'已拍攝完成':'標記為已拍攝')+'</button>';
+    html += '<div class="scene-notes"><div class="scene-notes-label">📝 拍攝備註</div><textarea class="scene-notes-box" placeholder="例如：光線不足，需補拍..." onchange="updateNote(\''+p.id+'\',\''+ph.key+'\','+si+',this.value)">'+sc.note+'</textarea></div>';
+    html += '</div></div>';
+  });
+  return html;
+}
 
 var projects = [];
 var openProject = null;
@@ -578,31 +826,21 @@ async function createProject() {
   if (!points) { alert('請填寫核心重點'); return; }
   var uid = getUserId();
   if (!uid) { alert('請先完成人設設定'); return; }
-  var length = getSelectedChip('length-chips');
-  var material = getSelectedChip('material-chips');
-  var style = getSelectedChip('style-chips');
   var btn = document.getElementById('create-btn');
-  var genBar = document.getElementById('gen-bar');
-  btn.disabled = true;
-  btn.textContent = '送出中...';
-  genBar.classList.add('on');
+  btn.disabled = true; btn.textContent = '送出中...';
+  document.getElementById('gen-bar').classList.add('on');
   var projId = 'p' + Date.now();
-  var tempProj = {
-    id: projId, user_id: uid, col: 'script', title: title,
-    tags: [], urgent: false, nodes: makeDefaultNodes()
-  };
+  var tempProj = { id:projId, user_id:uid, col:'script', title:title, tags:[], urgent:false, nodes:makeDefaultNodes() };
   var saved = null;
   if (!uid.startsWith('anon_')) { saved = await dbInsert(tempProj); }
   if (saved || uid.startsWith('anon_')) {
-    var proj = saved || tempProj;
-    projects.unshift(proj);
+    projects.unshift(saved || tempProj);
     renderFilters(); renderList();
   }
   try {
     await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id:uid, project_id:projId, title:title, points:points.replace(/\n/g,' ').replace(/\r/g,' '), length:length, material:material, style:style })
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ user_id:uid, project_id:projId, title:title, points:points.replace(/\n/g,' ').replace(/\r/g,' '), length:getSelectedChip('length-chips'), material:getSelectedChip('material-chips'), style:getSelectedChip('style-chips') })
     });
   } catch(e) { console.error('Webhook error', e); }
   closeModal();
@@ -611,10 +849,9 @@ async function createProject() {
 
 function startPolling(projId) {
   var attempts = 0;
-  var maxAttempts = 24;
   pollTimer = setInterval(async function() {
     attempts++;
-    if (attempts > maxAttempts) { clearInterval(pollTimer); return; }
+    if (attempts > 24) { clearInterval(pollTimer); return; }
     var res = await sbFetch('/projects?id=eq.' + projId);
     if (!res.ok) return;
     var data = await res.json();
@@ -625,6 +862,9 @@ function startPolling(projId) {
       var idx = projects.findIndex(function(p){ return p.id === projId; });
       if (idx > -1) projects[idx] = updated;
       renderFilters(); renderList();
+      if (openProject === projId) {
+        renderPanelBody(updated);
+      }
       showToast('✅ 腳本產出完成！');
     }
   }, 5000);
@@ -673,16 +913,11 @@ function renderList() {
     var sc = STAGE_COLORS[p.col]||STAGE_COLORS['script'];
     var tagsHtml = (p.tags||[]).map(function(t){ var tg=TAGS[t]||{label:t,bg:'#F1EFE8',color:'#444441'}; return '<span class="pc-tag" style="background:'+tg.bg+';color:'+tg.color+'">'+tg.label+'</span>'; }).join('');
     var dotsHtml = dots.map(function(d){ return '<div class="pb-seg" style="background:'+d+'"></div>'; }).join('');
-    return '<div class="project-card'+(p.urgent?' urgent':'')+'" id="card-'+p.id+'">'+
-      '<div class="pc-top">'+
-        '<div class="pc-title" onclick="openPanel(\''+p.id+'\')">'+( p.urgent?'⚠️ ':'')+p.title+'</div>'+
-        '<div class="pc-actions">'+
-          '<button class="pc-delete" onclick="askDelete(\''+p.id+'\',\''+p.title.replace(/'/g,"\\'")+'\')" title="刪除">🗑</button>'+
-          '<div class="pc-arrow" onclick="openPanel(\''+p.id+'\')">›</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="pc-meta" onclick="openPanel(\''+p.id+'\')"><span class="pc-stage" style="background:'+sc.bg+';color:'+sc.color+'">'+sc.label+'</span>'+tagsHtml+'</div>'+
-      '<div class="pc-bar" onclick="openPanel(\''+p.id+'\')">'+dotsHtml+'<span class="pc-count">'+done+'/6</span></div></div>';
+    return '<div class="project-card'+(p.urgent?' urgent':'')+'">'
+      +'<div class="pc-top"><div class="pc-title" onclick="openPanel(\''+p.id+'\')">'+(p.urgent?'⚠️ ':'')+p.title+'</div>'
+      +'<div class="pc-actions"><button class="pc-delete" onclick="askDelete(\''+p.id+'\',\''+p.title.replace(/'/g,"\\'")+'\')" title="刪除">🗑</button><div class="pc-arrow" onclick="openPanel(\''+p.id+'\')">›</div></div></div>'
+      +'<div class="pc-meta" onclick="openPanel(\''+p.id+'\')"><span class="pc-stage" style="background:'+sc.bg+';color:'+sc.color+'">'+sc.label+'</span>'+tagsHtml+'</div>'
+      +'<div class="pc-bar" onclick="openPanel(\''+p.id+'\')">'+dotsHtml+'<span class="pc-count">'+done+'/6</span></div></div>';
   }).join('');
   updateStats();
 }
@@ -693,10 +928,9 @@ function updateStats() {
   document.getElementById('s-done').textContent = projects.filter(function(p){return p.col==='done';}).length;
 }
 
-// 刪除相關
 function askDelete(id, title) {
   pendingDeleteId = id;
-  document.getElementById('confirm-sub').textContent = '「' + title + '」刪除後無法復原。';
+  document.getElementById('confirm-sub').textContent = '「'+title+'」刪除後無法復原。';
   document.getElementById('confirm-modal').classList.add('on');
 }
 function closeConfirm() {
@@ -714,7 +948,7 @@ async function confirmDelete() {
 }
 
 function openPanel(id) {
-  openProject=id; openNode=null;
+  openProject=id; openNode=null; rawScriptMode=false;
   var p = projects.filter(function(x){return x.id===id;})[0];
   var sc = STAGE_COLORS[p.col]||STAGE_COLORS['script'];
   document.getElementById('p-title').textContent = p.title;
@@ -725,73 +959,6 @@ function openPanel(id) {
   document.getElementById('overlay').classList.add('on');
 }
 
-function renderPromptSection(phKey, phColor, phBg) {
-  var list = PROMPTS[phKey];
-  if (!list||!list.length) return '';
-  var html = '<div class="prompt-section"><div class="ns-label">📋 AI 指令庫</div><div class="prompt-cards">';
-  list.forEach(function(p) {
-    html += '<div class="prompt-card"><div class="prompt-card-header">';
-    html += '<div class="prompt-num" style="background:'+phBg+';color:'+phColor+'">'+p.num+'</div>';
-    html += '<div class="prompt-title">'+p.title+'</div>';
-    html += '<button class="prompt-copy-btn" style="background:'+phBg+';color:'+phColor+'" onclick="copyPrompt(this,\''+encodeURIComponent(p.text)+'\')">複製</button>';
-    html += '</div><div class="prompt-body"><div class="prompt-text">'+p.text+'</div>';
-    html += '<div class="prompt-note">💡 '+p.note+'</div></div></div>';
-  });
-  html += '</div></div>';
-  return html;
-}
-
-function copyPrompt(btn, encoded) {
-  var text = decodeURIComponent(encoded);
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(text).then(function(){ showToast(); });
-  } else {
-    var ta = document.createElement('textarea');
-    ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-    showToast();
-  }
-  btn.textContent='✓ 已複製';
-  setTimeout(function(){ btn.textContent='複製'; },2000);
-}
-
-function showToast(msg) {
-  var t = document.getElementById('copy-toast');
-  t.textContent = msg || '✅ 已複製！貼給 Claude 使用';
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); },2500);
-}
-
-function renderSceneCards(p, ph) {
-  var n = p.nodes[ph.key];
-  if (!n.scenes||!n.scenes.length) return '<div style="text-align:center;padding:20px;color:var(--text3);font-size:12px">腳本產出後將自動生成分鏡卡片</div>';
-  var doneCnt = n.scenes.filter(function(s){return s.done;}).length;
-  var total = n.scenes.length;
-  var pct = total>0?Math.round(doneCnt/total*100):0;
-  var html = '<div class="ns-label">拍攝進度</div>';
-  html += '<div class="progress-detail"><div class="progress-bar-full"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+ph.color+'"></div></div>';
-  html += '<div class="progress-pct">'+pct+'%</div><div class="progress-sub">'+doneCnt+' / '+total+' 個分鏡完成</div></div>';
-  html += '<div class="ns-label">分鏡卡片</div><div class="scene-cards">';
-  n.scenes.forEach(function(sc,si) {
-    html += '<div class="scene-card'+(sc.done?' scene-done':'')+'">';
-    html += '<div class="scene-card-header"><div class="scene-num">'+(si+1)+'</div>';
-    html += '<div class="scene-title">'+sc.title+'</div><div class="scene-time">'+sc.time+'</div>';
-    if (sc.done) html += '<span class="scene-done-badge">✓ 完成</span>';
-    html += '</div><div class="scene-body">';
-    html += '<div class="scene-row"><div class="scene-info"><div class="scene-info-label">🎥 畫面說明</div><div class="scene-info-text">'+sc.shot+'</div></div>';
-    html += '<div class="scene-divider"></div>';
-    html += '<div class="scene-info"><div class="scene-info-label">🎙 口播腳本</div><div class="scene-info-text">'+sc.script+'</div></div></div>';
-    html += '<div class="scene-info-label" style="margin-top:4px">📁 檔案命名</div>';
-    html += '<div style="font-size:11px;font-family:monospace;background:var(--bg2);padding:4px 8px;border-radius:4px;color:var(--text2);margin-bottom:10px">'+sc.filename+'.mp4</div>';
-    html += '<button class="scene-check-btn'+(sc.done?' done':'')+'" onclick="toggleScene(\''+p.id+'\',\''+ph.key+'\','+si+')">';
-    html += '<div class="scene-check-icon">'+(sc.done?'✓':'')+'</div>'+(sc.done?'已拍攝完成':'標記為已拍攝')+'</button>';
-    html += '<div class="scene-notes"><div class="scene-notes-label">📝 拍攝備註</div>';
-    html += '<textarea class="scene-notes-box" placeholder="例如：光線不足，需補拍..." onchange="updateNote(\''+p.id+'\',\''+ph.key+'\','+si+',this.value)">'+sc.note+'</textarea></div>';
-    html += '</div></div>';
-  });
-  html += '</div>';
-  return html;
-}
-
 function renderPanelBody(p) {
   var html = '<div class="section-title">🗂 製作流程</div>';
   PHASES.forEach(function(ph,i) {
@@ -800,40 +967,36 @@ function renderPanelBody(p) {
     var sb = getStatusBadge(n.status);
     var isCurrent = n.status==='active'||n.status==='review';
     var bodyHtml = '';
-    if (ph.key==='shoot') {
-      bodyHtml += renderSceneCards(p,ph);
+
+    if (ph.key === 'script') {
+      bodyHtml = renderScriptNode(p);
+    } else if (ph.key === 'shoot') {
+      bodyHtml = renderSceneCards(p, ph);
+      // 留言
+      var sc2 = n.comments&&n.comments.length ? n.comments.map(function(c){ return '<div class="comment '+(c.ai?'ai-c':'user-c')+'"><div class="c-author">'+c.author+'</div><div class="c-text">'+c.text+'</div><div class="c-time">'+c.time+'</div></div>'; }).join('') : '<div style="font-size:11px;color:var(--text3);padding:4px 0 8px">尚無留言</div>';
+      bodyHtml += '<div class="ns-label" style="margin-top:14px">留言</div><div class="comments">'+sc2+'</div><div class="comment-row"><input id="ci-'+i+'" placeholder="輸入修改建議..." /><button class="send-btn" onclick="sendComment(\''+p.id+'\',\''+ph.key+'\','+i+')">送出</button></div>';
     } else {
       if (n.checks) {
         var dc=n.checks.filter(function(c){return c.done;}).length;
         var tot=n.checks.length;
         var pct=tot>0?Math.round(dc/tot*100):0;
-        bodyHtml += '<div class="ns-label">執行進度</div>';
-        bodyHtml += '<div class="progress-detail"><div class="progress-bar-full"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+ph.color+'"></div></div>';
-        bodyHtml += '<div class="progress-pct">'+pct+'%</div><div class="progress-sub">'+dc+' / '+tot+' 項完成</div></div>';
+        bodyHtml += '<div class="ns-label">執行進度</div><div class="progress-detail"><div class="progress-bar-full"><div class="progress-bar-fill" style="width:'+pct+'%;background:'+ph.color+'"></div></div><div class="progress-pct">'+pct+'%</div><div class="progress-sub">'+dc+' / '+tot+' 項完成</div></div>';
         bodyHtml += '<div class="ns-label">執行清單</div><div class="checklist">';
         n.checks.forEach(function(c,ci) {
-          bodyHtml += '<div class="check-item'+(c.done?' checked':'')+'" onclick="toggleCheck(\''+p.id+'\',\''+ph.key+'\','+ci+')">'+
-            '<div class="check-box'+(c.done?' on':'')+'>'+(c.done?'✓':'')+'</div>'+
-            '<span class="ci-text">'+c.text+'</span></div>';
+          bodyHtml += '<div class="check-item'+(c.done?' checked':'')+'" onclick="toggleCheck(\''+p.id+'\',\''+ph.key+'\','+ci+')"><div class="check-box'+(c.done?' on':'')+'>'+(c.done?'✓':'')+'</div><span class="ci-text">'+c.text+'</span></div>';
         });
         bodyHtml += '</div>';
       }
       if (ph.key==='cover'||ph.key==='edit') {
-        bodyHtml += '<div class="ns-label">'+(ph.key==='cover'?'封面上傳':'影片上傳')+'</div>';
-        bodyHtml += '<div class="upload-area"><div class="upload-icon">📁</div><div class="upload-label">點此上傳檔案</div></div>';
+        bodyHtml += '<div class="ns-label">'+(ph.key==='cover'?'封面上傳':'影片上傳')+'</div><div class="upload-area"><div class="upload-icon">📁</div><div class="upload-label">點此上傳檔案</div></div>';
       }
       if (n.content) {
         bodyHtml += '<div class="ns-label">產出內容</div><div class="content-box">'+n.content+'</div>';
       }
+      var cmts = n.comments&&n.comments.length ? n.comments.map(function(c){ return '<div class="comment '+(c.ai?'ai-c':'user-c')+'"><div class="c-author">'+c.author+'</div><div class="c-text">'+c.text+'</div><div class="c-time">'+c.time+'</div></div>'; }).join('') : '<div style="font-size:11px;color:var(--text3);padding:4px 0 8px">尚無留言</div>';
+      bodyHtml += '<div class="ns-label" style="margin-top:14px">留言</div><div class="comments">'+cmts+'</div><div class="comment-row"><input id="ci-'+i+'" placeholder="輸入修改建議..." /><button class="send-btn" onclick="sendComment(\''+p.id+'\',\''+ph.key+'\','+i+')">送出</button></div>';
     }
-    var phBg = ph.key==='script'?'#EEEDFE':ph.key==='edit'?'#E1F5EE':ph.key==='cover'?'#FAEEDA':ph.key==='copy'?'#FBEAF0':'#E6F1FB';
-    if (PROMPTS[ph.key]) bodyHtml += renderPromptSection(ph.key,ph.color,phBg);
-    var commentsHtml = '';
-    if (n.comments&&n.comments.length) {
-      commentsHtml = n.comments.map(function(c){ return '<div class="comment '+(c.ai?'ai-c':'user-c')+'"><div class="c-author">'+c.author+'</div><div class="c-text">'+c.text+'</div><div class="c-time">'+c.time+'</div></div>'; }).join('');
-    } else { commentsHtml = '<div style="font-size:11px;color:var(--text3);padding:4px 0 8px">尚無留言</div>'; }
-    bodyHtml += '<div class="ns-label">留言與修改建議</div><div class="comments">'+commentsHtml+'</div>';
-    bodyHtml += '<div class="comment-row"><input id="ci-'+i+'" placeholder="輸入修改建議..." /><button class="send-btn" onclick="sendComment(\''+p.id+'\',\''+ph.key+'\','+i+')">送出</button></div>';
+
     html += '<div class="node-card'+(isCurrent?' node-active':'')+(n.status==='done'?' node-done':'')+'" id="node-'+i+'">';
     html += '<div class="node-header" onclick="toggleNode('+i+')">';
     html += '<div class="node-dot" style="background:'+ph.color+'"></div>';
@@ -872,7 +1035,8 @@ async function toggleCheck(pid,phKey,ci) {
   renderPanelBody(p); renderList();
 }
 async function sendComment(pid,phKey,nodeIdx) {
-  var input=document.getElementById('ci-'+nodeIdx);
+  var inputId = phKey==='script' ? 'ci-script' : 'ci-'+nodeIdx;
+  var input=document.getElementById(inputId);
   var text=input.value.trim();
   if (!text) return;
   var p=projects.filter(function(x){return x.id===pid;})[0];
@@ -887,16 +1051,22 @@ async function sendComment(pid,phKey,nodeIdx) {
   },800);
 }
 
+function showToast(msg) {
+  var t = document.getElementById('copy-toast');
+  t.textContent = msg || '✅ 已複製！';
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); },2500);
+}
 function closePanel() {
   document.getElementById('panel').classList.remove('on');
   document.getElementById('overlay').classList.remove('on');
-  openProject=null; openNode=null;
+  openProject=null; openNode=null; rawScriptMode=false;
 }
 function openModal() {
   document.getElementById('new-title').value = '';
   document.getElementById('new-points').value = '';
   var btn = document.getElementById('create-btn');
-  btn.disabled = false; btn.textContent = '產出腳本 ✨';
+  btn.disabled=false; btn.textContent='產出腳本 ✨';
   document.getElementById('gen-bar').classList.remove('on');
   document.getElementById('modal').classList.add('on');
 }
@@ -904,10 +1074,7 @@ function closeModal() { document.getElementById('modal').classList.remove('on');
 
 async function init() {
   var uid = getUserId();
-  if (!uid) {
-    document.getElementById('loading').style.display='none';
-    showOnboarding(false); return;
-  }
+  if (!uid) { document.getElementById('loading').style.display='none'; showOnboarding(false); return; }
   if (!uid.startsWith('anon_')) {
     var user = await loadUser(uid);
     if (user) { currentUser = user; updateHeaderUser(); }
@@ -919,7 +1086,6 @@ async function init() {
   document.getElementById('loading').style.display='none';
   renderFilters(); renderList();
 }
-
 init();
 </script>
 </body>
