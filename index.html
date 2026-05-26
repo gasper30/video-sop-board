@@ -553,7 +553,10 @@ var TAGS = {
 
 var FORM_URLS = {
   persona:'https://docs.google.com/forms/d/e/1FAIpQLSdDPKn74Q0nvHGMz3CBCMcQPm2fNPc5UI_YnfTFmgpvqT3Mfg/viewform',
-  topic:  'https://docs.google.com/forms/d/e/1FAIpQLSdbStL0GwXDesh5ewfIWpBV1CEegFuV6g-sChOAji6xbEMGXw/viewform'
+  get topic() {
+    var uid = getUserId() || '';
+    return 'https://docs.google.com/forms/d/e/1FAIpQLSdbStL0GwXDesh5ewfIWpBV1CEegFuV6g-sChOAji6xbEMGXw/viewform?usp=pp_url&entry.1200326488=' + uid;
+  }
 };
 
 var PROMPTS = {
