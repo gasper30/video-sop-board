@@ -65,6 +65,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .panel-info{flex:1}
 .panel-title{font-size:15px;font-weight:700;line-height:1.4}
 .panel-stage{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:6px;margin-top:4px}
+.panel-delete-btn{background:var(--orange-bg);border:none;border-radius:8px;padding:6px 10px;font-size:16px;cursor:pointer;flex-shrink:0;margin-top:2px}
 .panel-body{padding:14px 18px 80px}
 .section-title{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 10px;display:flex;align-items:center;gap:6px}
 .section-title:first-child{margin-top:0}
@@ -247,6 +248,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
       <div class="panel-title" id="p-title"></div>
       <span class="panel-stage" id="p-stage"></span>
     </div>
+    <button class="panel-delete-btn" onclick="deleteProject()">🗑</button>
   </div>
   <div class="panel-body" id="p-body"></div>
 </div>
@@ -833,6 +835,18 @@ async function sendComment(pid,phKey,nodeIdx) {
     await dbUpdate(pid,{nodes:p.nodes,updated_at:new Date().toISOString()});
     renderPanelBody(p);
   },800);
+}
+
+async function deleteProject() {
+  var p = projects.filter(function(x){ return x.id === openProject; })[0];
+  if (!p) return;
+  if (!confirm('確定要刪除「' + p.title + '」嗎？')) return;
+  await dbDelete(p.id);
+  projects = projects.filter(function(x){ return x.id !== openProject; });
+  closePanel();
+  renderFilters();
+  renderList();
+  showToast('🗑 已刪除');
 }
 
 function closePanel() {
