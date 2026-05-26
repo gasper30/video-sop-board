@@ -575,7 +575,7 @@ async function createProject() {
     await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id:uid, project_id:projId, title:title, points:points, length:length, material:material, style:style })
+      body: JSON.stringify({ user_id:uid, project_id:projId, title:title, points:points.replace(/\n/g,' ').replace(/\r/g,' '), length:length, material:material, style:style })
     });
   } catch(e) { console.error('Webhook error', e); }
   closeModal();
