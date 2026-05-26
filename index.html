@@ -185,6 +185,32 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .empty-icon{font-size:40px;margin-bottom:12px}
 .empty-title{font-size:15px;font-weight:500;color:var(--text2);margin-bottom:6px}
 .empty-sub{font-size:13px}
+
+/* ── Onboarding ── */
+.onboard-screen{position:fixed;inset:0;background:var(--bg3);z-index:60;display:none;flex-direction:column;overflow-y:auto}
+.onboard-screen.on{display:flex}
+.onboard-inner{padding:40px 24px 60px;max-width:480px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:0}
+.onboard-steps{display:flex;gap:6px;margin-bottom:32px}
+.onboard-step{height:4px;border-radius:2px;flex:1;background:var(--bg2);transition:background .3s}
+.onboard-step.on{background:var(--purple)}
+.onboard-title{font-size:26px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.2}
+.onboard-sub{font-size:14px;color:var(--text3);margin-bottom:32px;line-height:1.6}
+.ob-label{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px;display:block}
+.ob-input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:15px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;margin-bottom:20px}
+.ob-input:focus{border-color:var(--purple)}
+.ob-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.ob-chip{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border2);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;font-family:inherit;background:var(--bg3);transition:all .15s}
+.ob-chip.on{background:var(--purple-bg);border-color:var(--purple);color:var(--purple)}
+.ob-textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--r-sm);font-size:14px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;margin-bottom:20px;resize:none;min-height:80px;line-height:1.6}
+.ob-textarea:focus{border-color:var(--purple)}
+.ob-next{width:100%;padding:15px;background:var(--purple);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px}
+.ob-skip{width:100%;padding:12px;background:transparent;color:var(--text3);border:none;font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px}
+.ob-saving{text-align:center;padding:60px 24px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.ob-saving-spinner{width:32px;height:32px;border:3px solid var(--purple-bg);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite}
+
+/* 右上角人設按鈕 */
+.persona-btn{background:var(--purple-bg);border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;color:var(--purple);cursor:pointer;font-family:inherit}
+
 @media(min-width:640px){
   .panel{left:auto;right:0;width:440px;border-left:1px solid var(--border)}
   .fab{bottom:30px;right:30px}
@@ -194,6 +220,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 </head>
 <body>
 
+<!-- Loading -->
 <div class="loading-screen" id="loading">
   <div class="loading-logo">🎬</div>
   <div class="loading-title">ShortsBoard</div>
@@ -201,12 +228,19 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   <div class="loading-sub">載入資料中...</div>
 </div>
 
+<!-- ── Onboarding ── -->
+<div class="onboard-screen" id="onboard-screen">
+  <div class="onboard-inner" id="onboard-inner"></div>
+</div>
+
+<!-- 主畫面 -->
 <div class="header">
   <div class="header-logo">🎬</div>
   <div class="header-info">
     <div class="header-title">ShortsBoard</div>
-    <div class="header-sub">短影音製作管理看板</div>
+    <div class="header-sub" id="header-sub">短影音製作管理看板</div>
   </div>
+  <button class="persona-btn" onclick="editPersona()" id="persona-btn" style="display:none">👤 人設</button>
 </div>
 <div class="stats">
   <div class="stat-card s-total"><div class="stat-icon">🎞️</div><div class="stat-num" id="s-total">0</div><div class="stat-label">Total</div></div>
@@ -264,7 +298,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 <div class="copy-toast" id="copy-toast">✅ 已複製！貼給 Claude 使用</div>
 
 <script>
-// ── Supabase 設定 ──
+// ── Supabase ──
 var SUPABASE_URL = 'https://hehezmuxbywvccbozawx.supabase.co';
 var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhlaGV6bXV4Ynl3dmNjYm96YXd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2ODQyMjksImV4cCI6MjA5NTI2MDIyOX0.oj5Ki_Q7jQmaLBRQFF9EcOKEJXv13wqMFxtjs5UnEOc';
 
@@ -278,8 +312,190 @@ function sbFetch(path, opts) {
   return fetch(SUPABASE_URL + '/rest/v1' + path, options);
 }
 
+// ── User / Onboarding ──
+var currentUser = null;
+
+function getUserId() { return localStorage.getItem('sb_user_id'); }
+function setUserId(id) { localStorage.setItem('sb_user_id', id); }
+
+async function loadUser(id) {
+  var res = await sbFetch('/users?id=eq.' + id);
+  if (!res.ok) return null;
+  var data = await res.json();
+  return data.length ? data[0] : null;
+}
+
+async function saveUser(userData) {
+  var res = await sbFetch('/users', {
+    method: 'POST',
+    body: JSON.stringify(userData)
+  });
+  if (!res.ok) { console.error('Save user failed', await res.text()); return null; }
+  var data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function updateUser(id, fields) {
+  var res = await sbFetch('/users?id=eq.' + id, {
+    method: 'PATCH',
+    body: JSON.stringify(fields)
+  });
+  if (!res.ok) console.error('Update user failed', await res.text());
+}
+
+// ── Onboarding UI ──
+var obStep = 1;
+var obData = { name:'', topics:[], style:[], audience:'', never_cover:'', platforms:[] };
+
+var TOPICS = ['理財省錢','親子教育','美食旅遊','電商創業','生活日常','健康養生','職場工作','其他'];
+var STYLES = ['親切像朋友','直接犀利','故事感強','數據導向','輕鬆幽默','溫柔療癒'];
+var PLATFORMS = ['IG Reels','YouTube Shorts','Facebook','LINE社群','Threads','TikTok'];
+
+function showOnboarding(isEdit) {
+  obStep = 1;
+  if (isEdit && currentUser) {
+    obData = {
+      name: currentUser.name || '',
+      topics: currentUser.topics || [],
+      style: currentUser.style || [],
+      audience: currentUser.audience || '',
+      never_cover: currentUser.never_cover || '',
+      platforms: currentUser.platforms || []
+    };
+  } else {
+    obData = { name:'', topics:[], style:[], audience:'', never_cover:'', platforms:[] };
+  }
+  document.getElementById('onboard-screen').classList.add('on');
+  renderObStep();
+}
+
+function renderObStep() {
+  var inner = document.getElementById('onboard-inner');
+  var stepsHtml = [1,2,3].map(function(i){ return '<div class="onboard-step'+(i<=obStep?' on':'')+'"></div>'; }).join('');
+
+  if (obStep === 1) {
+    inner.innerHTML =
+      '<div class="onboard-steps">'+stepsHtml+'</div>'+
+      '<div class="onboard-title">告訴我你是誰 👋</div>'+
+      '<div class="onboard-sub">之後產出的每份腳本，都會完全符合你的風格。</div>'+
+      '<label class="ob-label">你的名字或頻道名稱</label>'+
+      '<input class="ob-input" id="ob-name" placeholder="例如：Rika" value="'+obData.name+'" />'+
+      '<label class="ob-label">內容領域（可複選）</label>'+
+      '<div class="ob-chips">'+TOPICS.map(function(t){ return '<button class="ob-chip'+(obData.topics.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'topics\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div>'+
+      '<button class="ob-next" onclick="obNext1()">下一步 →</button>'+
+      '<button class="ob-skip" onclick="obSkipAll()">暫時跳過</button>';
+  } else if (obStep === 2) {
+    inner.innerHTML =
+      '<div class="onboard-steps">'+stepsHtml+'</div>'+
+      '<div class="onboard-title">你的說話風格 🎙</div>'+
+      '<div class="onboard-sub">AI 會用這個風格幫你寫腳本。</div>'+
+      '<label class="ob-label">說話風格（可複選）</label>'+
+      '<div class="ob-chips">'+STYLES.map(function(t){ return '<button class="ob-chip'+(obData.style.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'style\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div>'+
+      '<label class="ob-label">目標觀眾</label>'+
+      '<input class="ob-input" id="ob-audience" placeholder="例如：28-45 歲台灣媽媽" value="'+obData.audience+'" />'+
+      '<label class="ob-label">發布平台（可複選）</label>'+
+      '<div class="ob-chips">'+PLATFORMS.map(function(t){ return '<button class="ob-chip'+(obData.platforms.indexOf(t)>-1?' on':'')+'" onclick="obToggle(this,\'platforms\',\''+t+'\')">'+t+'</button>'; }).join('')+'</div>'+
+      '<button class="ob-next" onclick="obNext2()">下一步 →</button>';
+  } else if (obStep === 3) {
+    inner.innerHTML =
+      '<div class="onboard-steps">'+stepsHtml+'</div>'+
+      '<div class="onboard-title">最後一步 ✨</div>'+
+      '<div class="onboard-sub">告訴 AI 什麼話題絕對不能碰。</div>'+
+      '<label class="ob-label">絕對不談的話題</label>'+
+      '<textarea class="ob-textarea" id="ob-never" placeholder="例如：政治、宗教、競品比較、特定股票建議">'+obData.never_cover+'</textarea>'+
+      '<button class="ob-next" onclick="obFinish()">完成設定 🎉</button>';
+  }
+}
+
+function obToggle(btn, field, val) {
+  var arr = obData[field];
+  var idx = arr.indexOf(val);
+  if (idx > -1) { arr.splice(idx, 1); btn.classList.remove('on'); }
+  else { arr.push(val); btn.classList.add('on'); }
+}
+
+function obNext1() {
+  var name = document.getElementById('ob-name').value.trim();
+  if (!name) { alert('請輸入你的名字或頻道名稱'); return; }
+  obData.name = name;
+  obStep = 2; renderObStep();
+}
+
+function obNext2() {
+  obData.audience = document.getElementById('ob-audience').value.trim();
+  obStep = 3; renderObStep();
+}
+
+async function obFinish() {
+  obData.never_cover = document.getElementById('ob-never').value.trim();
+  var inner = document.getElementById('onboard-inner');
+  inner.innerHTML = '<div class="ob-saving"><div class="ob-saving-spinner"></div><div style="font-size:16px;font-weight:700;color:var(--text)">儲存中...</div></div>';
+
+  var existingId = getUserId();
+  if (existingId && currentUser) {
+    // 編輯模式：更新
+    await updateUser(existingId, {
+      name: obData.name,
+      topics: obData.topics,
+      style: obData.style,
+      audience: obData.audience,
+      never_cover: obData.never_cover,
+      platforms: obData.platforms,
+      updated_at: new Date().toISOString()
+    });
+    currentUser = Object.assign(currentUser, obData);
+  } else {
+    // 新用戶：建立
+    var newUser = {
+      id: 'u' + Date.now(),
+      name: obData.name,
+      topics: obData.topics,
+      style: obData.style,
+      audience: obData.audience,
+      never_cover: obData.never_cover,
+      platforms: obData.platforms
+    };
+    var saved = await saveUser(newUser);
+    if (!saved) { alert('儲存失敗，請稍後再試'); renderObStep(); return; }
+    currentUser = saved;
+    setUserId(saved.id);
+  }
+
+  document.getElementById('onboard-screen').classList.remove('on');
+  updateHeaderUser();
+  if (!getUserId()) return;
+  var data = await dbGetAll();
+  projects = data;
+  renderFilters();
+  renderList();
+}
+
+function obSkipAll() {
+  // 給一個匿名 user_id，不存 Supabase
+  var anonId = 'anon_' + Date.now();
+  setUserId(anonId);
+  currentUser = { id: anonId, name: '創作者' };
+  document.getElementById('onboard-screen').classList.remove('on');
+  updateHeaderUser();
+}
+
+function editPersona() { showOnboarding(true); }
+
+function updateHeaderUser() {
+  if (currentUser && currentUser.name) {
+    document.getElementById('header-sub').textContent = '👋 ' + currentUser.name + ' 的看板';
+    document.getElementById('persona-btn').style.display = 'block';
+  }
+}
+
+// ── DB ──
 async function dbGetAll() {
-  var res = await sbFetch('/projects?order=created_at.desc');
+  var uid = getUserId();
+  if (!uid) return [];
+  var path = uid.startsWith('anon_')
+    ? '/projects?order=created_at.desc'
+    : '/projects?user_id=eq.' + uid + '&order=created_at.desc';
+  var res = await sbFetch(path);
   if (!res.ok) return [];
   return await res.json();
 }
@@ -347,39 +563,19 @@ var PROMPTS = {
     {num:3,title:'提高完播率指令',text:'我是 Rika，觀眾是忙碌的媽媽，容易滑走。\n\n把以下腳本優化得更生動，提高完播率：\n- 有畫面感，增加氛圍感描寫\n- 將形容詞轉換成場景式表達\n- 讀起來身歷其境、情緒飽滿\n- 保留原意不改核心內容\n\n【貼上你的腳本內容】',note:'提高觀眾看完整支影片的機率'},
     {num:4,title:'分鏡腳本產出指令',text:'我是 Rika，1寶媽，不露臉，說話親切直接有故事感。\n影片風格：【教學乾貨/故事分享/輕鬆聊天】\n影片長度：【30-60秒/1-2分鐘】\n主題：【填入主題】\n\n請幫我產出完整分鏡腳本：\n- Hook（0-3秒）：畫面說明 + 口播內容\n- 重點一：畫面說明 + 口播內容\n- 重點二：畫面說明 + 口播內容\n- 重點三：畫面說明 + 口播內容\n- CTA：口播內容\n- 建議檔案命名',note:'填入主題後即可產出完整分鏡'},
     {num:5,title:'痛點開場指令',text:'我是 Rika，觀眾是 28-45 歲媽媽。\n\n幫我針對以下主題，產出 3 個不同方向的痛點開場：\n方向一：用數字衝擊\n方向二：用場景帶入\n方向三：用反問句\n\n主題：【填入主題】',note:'3個方向選一個最有感的用'},
-    {num:6,title:'懸念開場指令',text:'我是 Rika，做省錢旅遊理財育兒內容。\n\n幫我針對以下主題，設計一個製造懸念的開場：\n- 說一個讓人很好奇的結果，但不說原因\n- 讓觀眾一定要繼續看才知道答案\n- 適合口播，不超過 15 個字\n\n主題：【填入主題】',note:'適合「你絕對不知道的...」這類題材'},
-    {num:7,title:'故事化腳本指令',text:'我是 Rika，從愛買轉成愛寶的1寶媽。\n\n幫我把以下資訊轉換成故事型腳本：\n- 用第一人稱說故事\n- 帶入具體的場景和情緒\n- 讓觀眾有「我也是這樣！」的感覺\n- 在故事中自然帶出重點和解法\n- 結尾有 CTA\n\n主題或資訊：【填入內容】',note:'最適合 Rika 的風格，轉化率高'},
-    {num:8,title:'數字強化指令',text:'我是 Rika，喜歡用數字舉例讓媽媽很有感。\n\n幫我把以下腳本中的模糊敘述，換成具體數字：\n- 把「很多」換成具體數字\n- 把「省錢」換成「每月省 XXX 元」\n- 把「很快」換成「3 步驟」「5 分鐘」\n- 保留原意\n\n【貼上你的腳本內容】',note:'讓抽象變具體，讓媽媽更有感'},
-    {num:9,title:'CTA 結尾指令',text:'我是 Rika，觀眾是 28-45 歲媽媽。\n\n幫我設計 3 個不同方向的結尾 CTA：\n方向一：邀請留言互動\n方向二：引導追蹤\n方向三：引導分享\n\n主題：【填入主題】',note:'選一個最符合這支影片目標的 CTA'},
-    {num:10,title:'腳本長度壓縮指令',text:'幫我把以下腳本壓縮到適合短影音的長度：\n- 目標長度：【30秒/60秒/90秒】\n- 原意完全不變，留核心觀點\n- 刪除重複或多餘的表達\n- 語句俐落通順\n\n【貼上你的腳本內容】',note:'長腳本壓縮成短影音版本專用'},
   ],
   edit:[
     {num:21,title:'爆款標題優化指令',text:'我是 Rika，做省錢育兒旅遊理財短影音。\n\n幫我針對以下主題，產出 5 個爆款標題：\n- 數字型、反問型、痛點型、懸念型、故事型各一\n\n主題：【填入主題】',note:'5個方向選最有感的一個'},
     {num:24,title:'完播率檢查指令',text:'幫我檢查以下腳本是否能維持完播率：\n- Hook 前三秒夠不夠吸引人？\n- 中間有沒有讓人想滑走的地方？\n- 給我具體的修改建議\n\n【貼上你的腳本內容】',note:'後製前用這個檢查腳本一遍'},
-    {num:25,title:'情緒共鳴加強指令',text:'我是 Rika，觀眾是 28-45 歲的台灣媽媽。\n\n幫我把以下腳本加入更多情緒共鳴：\n- 加入媽媽日常會遇到的具體場景\n- 讓媽媽覺得「她懂我！」\n- 不要說教，要像閨蜜在說話\n\n【貼上你的腳本內容】',note:'讓冷冰冰的資訊變成有溫度的分享'},
-    {num:26,title:'節奏加速指令',text:'幫我把以下腳本的節奏加快：\n- 刪掉廢話和過渡語\n- 句子縮短，多用短句\n- 讓整體節奏感覺快 30%\n\n【貼上你的腳本內容】',note:'腳本太冗長時使用'},
   ],
   cover:[
-    {num:27,title:'封面圖卡標題指令',text:'我是 Rika，封面不露臉，純文字圖形設計。\n\n幫我產出封面圖卡文字：\n- 大標題（6字以內，衝擊感強）\n- 副標題（一句話說清楚）\n- 建議封面樣式：A黑底爆字/B紫底撞色/C白底衝擊/D深綠反白/E米白極簡/F橘黃分割\n\n影片主題：【填入主題】',note:'大標題6字以內才能一秒被看到'},
-    {num:28,title:'YouTube 縮圖文字指令',text:'我是 Rika，YouTube Shorts 頻道。\n\n幫我產出 YouTube 縮圖文字：\n- 主標題（震撼，不超過 8 字）\n- 副標題（補充說明，不超過 12 字）\n- 強調色關鍵詞（2-3個）\n\n影片主題：【填入主題】',note:'YouTube 縮圖決定點擊率'},
-    {num:29,title:'系列影片封面指令',text:'我是 Rika，想做系列影片。\n\n幫我設計封面視覺規則：\n- 系列名稱和標識方式\n- 固定的文字位置和格式\n- 每集的差異元素\n\n系列主題：【填入主題】\n預計集數：【填入集數】',note:'系列影片要讓觀眾有追劇感'},
-    {num:30,title:'封面 A/B 測試指令',text:'幫我設計兩個方向的封面文案：\n\n版本 A（情感共鳴型）：讓媽媽看到就覺得「這說的是我！」\n版本 B（數字乾貨型）：讓媽媽看到就知道「這有用！」\n\n影片主題：【填入主題】',note:'兩個版本輪流試，看哪個互動率更高'},
+    {num:27,title:'封面圖卡標題指令',text:'我是 Rika，封面不露臉，純文字圖形設計。\n\n幫我產出封面圖卡文字：\n- 大標題（6字以內，衝擊感強）\n- 副標題（一句話說清楚）\n\n影片主題：【填入主題】',note:'大標題6字以內才能一秒被看到'},
   ],
   copy:[
-    {num:11,title:'IG 貼文文案指令',text:'我是 Rika，1寶媽，說話親切溫暖、直接犀利、喜歡用數字。\n觀眾：28-45 歲台灣媽媽。\n\n幫我寫一則 IG 貼文說明文案：\n- 第一行是吸睛 Hook\n- 內文簡短有力，3-5 行\n- 結尾邀請互動\n- 不超過 150 字\n\n影片主題：【填入主題】',note:'IG 用，第一行決定點閱率'},
-    {num:12,title:'FB 貼文文案指令',text:'我是 Rika，在 FB 分享省錢育兒旅遊理財內容。\n\n幫我寫一則 FB 貼文說明文案：\n- 開場用情感故事或共鳴場景帶入\n- 語氣像在跟老朋友說話\n- 長度 100-200 字\n\n影片主題：【填入主題】',note:'FB 適合情感溫度高的文案'},
-    {num:13,title:'Threads 貼文指令',text:'我是 Rika，在 Threads 和媽媽們聊天。\n\n幫我寫一則 Threads 貼文：\n- 像在聊天，對話感強\n- 不超過 80 字\n- 結尾問一個讓媽媽想回覆的問題\n\n影片主題：【填入主題】',note:'Threads 要像在聊天'},
-    {num:14,title:'YouTube 標題+說明欄指令',text:'我是 Rika，YouTube Shorts 頻道。\n\n幫我產出：\n1. YouTube 標題（含 SEO 關鍵字，不超過 60 字）\n2. 說明欄第一段（100字以內）\n3. 說明欄標籤（10-15 個）\n\n影片主題：【填入主題】',note:'標題是 YouTube 點閱率的關鍵'},
-    {num:15,title:'LINE 社群發文指令',text:'我是 Rika，在 LINE 社群分享實用資訊給媽媽們。\n\n幫我寫一則 LINE 社群貼文：\n- 開頭像在群組裡跟媽媽說話\n- 直接說重點，不廢話\n- 不超過 60 字\n\n影片主題：【填入主題】',note:'LINE 社群重視實用性'},
-    {num:16,title:'危禁詞檢查指令',text:'幫我檢查以下文案，符合 IG 和 YouTube 社群規定：\n- 替換掉危禁詞（最好、第一、最便宜、百分百、保證、絕對等）\n- 保留原文核心內容\n- 列出替換了哪些詞\n\n【貼上你的文案內容】',note:'發布前必做！避免被平台降觸及'},
-    {num:17,title:'獲客引流文案指令',text:'我是 Rika，做省錢育兒旅遊理財內容。\n\n幫我優化以下文案，自然植入引流邏輯：\n- 不生硬，不像在賣東西\n- 引導她主動來問或追蹤\n- 合規不違規\n\n【貼上你的文案內容】',note:'適合有商業目的的影片'},
-    {num:18,title:'統一標籤包指令',text:'我是 Rika，做省錢育兒旅遊理財短影音。\n平台：IG Reels、YouTube Shorts、Facebook。\n\n幫我產出一組標籤包：\n- IG 標籤：20-25 個\n- YouTube 標籤：10-15 個\n- 通用標籤：5 個\n\n影片主題：【填入主題】',note:'標籤要混合大中小流量'},
-    {num:19,title:'精簡文案指令',text:'幫我精簡壓縮以下文案：\n- 原意完全不變\n- 刪除重複或多餘的表達\n- 語句俐落通順\n\n目標字數：【填入目標字數】\n【貼上你的文案內容】',note:'長文案壓縮成各平台適合的長度'},
     {num:20,title:'五平台一鍵文案指令',text:'我是 Rika，1寶媽，做省錢育兒旅遊理財短影音。\n風格：親切溫暖、直接犀利、故事感強、喜歡用數字。\n觀眾：28-45 歲台灣媽媽。\n\n影片主題：【填入主題】\n影片核心重點：【填入3個重點】\n\n請一次產出五份發布文案：\n① IG 說明文字（150字以內，含標籤）\n② FB 說明文字（情感故事開場，100-200字）\n③ Threads 貼文（對話感，80字以內）\n④ YouTube 標題+說明欄（含SEO）\n⑤ LINE 社群發文（直接實用，60字以內）',note:'一次搞定五個平台，省最多時間'},
   ],
   publish:[
     {num:22,title:'對標帳號分析指令',text:'我做省錢育兒旅遊理財短影音，觀眾是台灣媽媽，不露臉。\n\n請幫我分析以下帳號：\n- Hook 方式是什麼？\n- 說話節奏如何？\n- 我能學到什麼？\n- 我的差異化可以是什麼？\n\n帳號：【填入帳號名稱】',note:'分析對標帳號，找出差異化定位'},
-    {num:23,title:'反常識開場指令',text:'我是 Rika，做省錢旅遊理財育兒內容。\n\n幫我設計一個「反常識」的開場：\n- 說一個媽媽以為對，但其實錯的觀念\n- 讓觀眾產生「什麼？！」的反應\n- 適合口播，不超過 20 個字\n\n主題：【填入主題】',note:'反常識開場留人率最高'},
   ]
 };
 
@@ -407,7 +603,7 @@ function makeDefaultNodes() {
     cover:{status:'wait',content:'後製完成後，提供標題即可產出封面圖卡',comments:[]},
     copy:{status:'wait',content:'封面確認後，自動產出五平台發布文案',comments:[]},
     publish:{status:'wait',checks:[
-      {done:false,text:'Claude 建議發布時間確認'},
+      {done:false,text:'確認發布時間'},
       {done:false,text:'Meta Business Suite 排程 FB+IG'},
       {done:false,text:'YouTube Studio 排程上傳'},
       {done:false,text:'Threads 排程發布'},
@@ -678,16 +874,28 @@ function toggleUrgent() {
 async function createProject() {
   var title=document.getElementById('new-title').value.trim();
   if (!title){alert('請輸入影片標題');return;}
+  var uid = getUserId();
+  if (!uid) { alert('請先完成人設設定'); return; }
   var tag=document.getElementById('new-tag').value;
   var stage=document.getElementById('new-stage').value;
   var newProj = {
     id:'p'+Date.now(),
+    user_id: uid,
     col:stage,
     title:title,
     tags:[tag],
     urgent:urgentNew,
     nodes:makeDefaultNodes()
   };
+  // anon 用戶不存 Supabase，只存本地
+  if (uid.startsWith('anon_')) {
+    projects.unshift(newProj);
+    closeModal();
+    renderFilters();
+    renderList();
+    document.getElementById('new-title').value='';
+    return;
+  }
   var saved = await dbInsert(newProj);
   if (saved) {
     projects.unshift(saved);
@@ -700,7 +908,26 @@ async function createProject() {
   }
 }
 
+// ── Init ──
 async function init() {
+  var uid = getUserId();
+  if (!uid) {
+    // 第一次：顯示 Onboarding
+    document.getElementById('loading').style.display='none';
+    showOnboarding(false);
+    return;
+  }
+  // 有 user_id：載入用戶資料
+  if (!uid.startsWith('anon_')) {
+    var user = await loadUser(uid);
+    if (user) {
+      currentUser = user;
+      updateHeaderUser();
+    }
+  } else {
+    currentUser = { id: uid, name: '創作者' };
+    updateHeaderUser();
+  }
   var data = await dbGetAll();
   projects = data;
   document.getElementById('loading').style.display='none';
