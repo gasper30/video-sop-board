@@ -92,7 +92,25 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 /* 步驟說明 hint */
 .step-hint{background:var(--purple-bg);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--purple);line-height:1.6}
 
-/* ===== 腳本分鏡系統 ===== */
+/* ===== 腳本卡片導航 ===== */
+.card-nav-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;margin-bottom:14px;scrollbar-width:none}
+.card-nav-strip::-webkit-scrollbar{display:none}
+.card-nav-item{flex-shrink:0;min-width:80px;max-width:110px;padding:8px 10px;border:1.5px solid var(--border2);border-radius:var(--r-sm);background:var(--bg3);cursor:pointer;transition:all .15s}
+.card-nav-item:active{opacity:.8}
+.card-nav-dot{width:8px;height:8px;border-radius:50%;margin-bottom:4px}
+.card-nav-label{font-size:11px;font-weight:700;line-height:1.3;word-break:break-all}
+.card-nav-time{font-size:9px;color:var(--text3);margin-top:2px}
+/* Emoji 情境板 */
+.emoji-context{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.emoji-tag{display:flex;align-items:center;gap:4px;padding:4px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;font-size:11px;color:var(--text2)}
+/* 拍攝提示 */
+.shoot-tip{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;background:var(--amber-bg);border-radius:var(--r-sm);font-size:12px;color:var(--amber);line-height:1.6;margin-top:8px}
+/* 底部導航 */
+.card-bottom-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 0 4px;border-top:1px solid var(--border);margin-top:14px}
+.card-nav-btn{padding:10px 20px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg3);font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:inherit;transition:all .15s}
+.card-nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.card-nav-btn.next{background:var(--purple);border-color:var(--purple);color:#fff}
+.card-nav-btn.next:disabled{background:var(--bg2);border-color:var(--border2);color:var(--text3)}
 .script-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .copy-all-btn{display:flex;align-items:center;gap:5px;padding:8px 14px;background:var(--purple);color:#fff;border:none;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
 .raw-toggle{padding:8px 12px;background:var(--bg2);color:var(--text2);border:none;border-radius:var(--r-sm);font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
@@ -722,138 +740,249 @@ function copyText(text,msg){
 // ===== 渲染腳本節點 =====
 var rawScriptMode=false;
 var notesOpen=false;
-function renderScriptNode(p,parsed) {
-  var n=p.nodes.script;
-  var content=n.content||'';
-  var isGen=content==='AI 正在產出腳本，請稍候...';
-  var html='';
+function getEmojiContext(visualLines, title) {
+  var text = (visualLines.join(' ') + ' ' + title).toLowerCase();
+  var tags = [];
+  // 場景類型
+  if (/手機|app|螢幕|畫面|地圖|錄屏/.test(text)) tags.push({icon:'📱', label:'手機錄製'});
+  else if (/戶外|停車場|入口|街|百貨|外景/.test(text)) tags.push({icon:'🏙️', label:'戶外場景'});
+  else if (/室內|辦公|家|居家/.test(text)) tags.push({icon:'🏠', label:'室內場景'});
+  else tags.push({icon:'🎬', label:'一般場景'});
+  // 鏡頭類型
+  if (/特寫|close|近景|細節|小卡|牌子|展示/.test(text)) tags.push({icon:'🔍', label:'近景特寫'});
+  else if (/全身|站立|走|蒙太奇|快速/.test(text)) tags.push({icon:'🚶', label:'全身動態'});
+  else if (/半身|上身|比讚|眨眼|表情|靠近鏡頭/.test(text)) tags.push({icon:'🧍', label:'半身人物'});
+  else tags.push({icon:'👁️', label:'主體細節'});
+  // 構圖
+  if (/俯拍|俯視|由上|top/.test(text)) tags.push({icon:'📐', label:'俯拍構圖'});
+  else if (/指著|方向|地圖|導覽/.test(text)) tags.push({icon:'👆', label:'指示構圖'});
+  else tags.push({icon:'🎯', label:'正面構圖'});
+  // 燈光/氣氛
+  if (/陽光|光線|戶外|自然光/.test(text)) tags.push({icon:'☀️', label:'自然採光'});
+  else if (/字幕|跑馬|動畫|特效/.test(text)) tags.push({icon:'✨', label:'後製特效'});
+  else tags.push({icon:'💡', label:'補光建議'});
+  return tags.slice(0, 4);
+}
 
-  if(isGen){
-    html='<div class="generating-box"><div class="generating-spinner"></div><div style="font-size:13px;font-weight:600;color:var(--purple)">AI 正在產出腳本中...</div><div style="font-size:11px;color:var(--text3);margin-top:6px">完成後會自動更新，不用等在這裡 🙌</div></div>';
-  } else if(parsed&&!rawScriptMode){
-    var segs=parsed.segments;
-    var notes=parsed.productionNotes;
+function getShootTip(visualLines, title) {
+  var text = (visualLines.join(' ') + ' ' + title).toLowerCase();
+  if (/手機|螢幕|app|地圖/.test(text)) return '拍螢幕時關閉螢幕自動旋轉，亮度調到最高，避免反光。';
+  if (/戶外|停車場|入口|街/.test(text)) return '戶外鏡頭先看光線，避開逆光，人物站在陰影邊緣會比較穩。';
+  if (/特寫|牌子|細節|展示/.test(text)) return '靠近主體拍，開啟手機微距模式，固定手機避免模糊。';
+  if (/蒙太奇|快速|走進|逛/.test(text)) return '蒙太奇鏡頭每個動作拍 5 秒以上，後製再剪短，素材多比較好選。';
+  if (/比讚|眨眼|靠近|表情|直視/.test(text)) return '架好三腳架或靠牆固定，眼睛看鏡頭不要看螢幕，表情放鬆。';
+  if (/字幕|跑馬|動畫/.test(text)) return '這段在後製加字幕，拍攝時保持背景乾淨，留足夠的空間放字。';
+  return '拍攝前先試拍 3 秒確認對焦和曝光，正式拍攝前後各多留 2 秒緩衝。';
+}
+
+var currentCardIdx = 0;
+var segsRef = [];
+
+function renderScriptNode(p, parsed) {
+  var n = p.nodes.script;
+  var content = n.content || '';
+  var isGen = content === 'AI 正在產出腳本，請稍候...';
+  var html = '';
+
+  if (isGen) {
+    html = '<div class="generating-box"><div class="generating-spinner"></div><div style="font-size:13px;font-weight:600;color:var(--purple)">AI 正在產出腳本中...</div><div style="font-size:11px;color:var(--text3);margin-top:6px">完成後會自動更新，不用等在這裡 🙌</div></div>';
+  } else if (parsed && !rawScriptMode) {
+    var segs = parsed.segments;
+    var notes = parsed.productionNotes;
+    segsRef = segs;
+    var total = segs.length;
+    var idx = Math.max(0, Math.min(currentCardIdx, total - 1));
+    var seg = segs[idx];
 
     // 工具列
-    html+='<div class="script-toolbar">';
-    html+='<button class="copy-all-btn" onclick="copyAllScript()">📋 複製完整腳本</button>';
-    html+='<button class="raw-toggle" onclick="toggleRaw()">原始文字</button>';
-    html+='</div>';
+    html += '<div class="script-toolbar">';
+    html += '<button class="copy-all-btn" onclick="copyAllScript()">📋 複製完整腳本</button>';
+    html += '<button class="raw-toggle" onclick="toggleRaw()">原始文字</button>';
+    html += '</div>';
 
-    // 時間軸
-    html+='<div class="script-timeline">';
-    var prevColor='';
-    segs.forEach(function(seg,i){
-      var isNewParent=(i===0)||segs[i-1].parentTitle!==seg.parentTitle;
-      if(i>0) html+='<div class="tl-line" style="background:'+(isNewParent?'var(--border2)':seg.color+'60')+'"></div>';
-      var label=seg.isSub&&!seg.isFirstSub?seg.subTime:seg.title;
-      html+='<div class="tl-item"><div class="tl-node" onclick="scrollToCard('+i+')">';
-      html+='<div class="tl-dot'+(seg.isSub&&!seg.isFirstSub?' '':'')+'" style="color:'+seg.color+';background:'+seg.color+'"></div>';
-      html+='<div class="tl-label" style="color:'+seg.color+'">'+label+'</div>';
-      if(seg.subTime&&seg.isFirstSub) html+='<div class="tl-time">'+seg.timeRange+'</div>';
-      else if(seg.timeRange&&!seg.isSub) html+='<div class="tl-time">'+seg.timeRange+'</div>';
-      else if(seg.subTime&&!seg.isFirstSub) html+='<div class="tl-time">'+seg.subTime+'</div>';
-      html+='</div></div>';
+    // 橫排卡片導航
+    html += '<div class="card-nav-strip" id="card-nav-strip">';
+    segs.forEach(function(s, i) {
+      var isActive = i === idx;
+      var label = s.isSub && !s.isFirstSub ? s.subTime : s.title;
+      var time = s.subTime ? s.subTime : s.timeRange;
+      html += '<div class="card-nav-item'+(isActive?' active':'')+'" onclick="goToCard('+i+')" style="border-color:'+(isActive?s.color:'var(--border2)')+';background:'+(isActive?s.color+'15':'var(--bg3)')+';">';
+      html += '<div class="card-nav-dot" style="background:'+s.color+'"></div>';
+      html += '<div class="card-nav-label" style="color:'+(isActive?s.color:'var(--text2)')+'">'+label+'</div>';
+      if (time) html += '<div class="card-nav-time">'+time+'</div>';
+      html += '</div>';
     });
-    html+='</div>';
+    // 全部瀏覽
+    html += '<div class="card-nav-item'+(currentCardIdx===-1?' active':'')+'" onclick="goToCard(-1)" style="border-color:'+(currentCardIdx===-1?'var(--purple)':'var(--border2)')+';background:'+(currentCardIdx===-1?'var(--purple-bg)':'var(--bg3)')+';">';
+    html += '<div class="card-nav-dot" style="background:var(--purple)"></div>';
+    html += '<div class="card-nav-label" style="color:'+(currentCardIdx===-1?'var(--purple)':'var(--text2)')+'">全部</div>';
+    html += '<div class="card-nav-time">'+total+' 張卡</div>';
+    html += '</div>';
+    html += '</div>';
 
-    // 分鏡卡片
-    segs.forEach(function(seg,i){
-      var cardId='scard-'+i;
-      var borderStyle=seg.isSub?'border-left:3px solid '+seg.color+';':'';
-      html+='<div class="scard" id="'+cardId+'" style="'+borderStyle+'">';
-      // Header
-      html+='<div class="scard-header" style="background:'+seg.color+'12;">';
-      if(!seg.isSub||seg.isFirstSub){
-        html+='<div class="scard-num" style="background:'+seg.color+'">'+seg.index+'</div>';
-        html+='<div class="scard-title" style="color:'+seg.color+'">'+seg.title+'</div>';
-      } else {
-        html+='<div style="width:24px;flex-shrink:0"></div>';
-        html+='<div class="scard-title" style="color:'+seg.color+';font-size:12px;opacity:.8">'+seg.title+'</div>';
-      }
-      if(seg.subTime){
-        html+='<div class="scard-time">'+seg.subTime+'</div>';
-      } else if(seg.timeRange){
-        html+='<div class="scard-time">'+seg.timeRange+'</div>';
-      }
-      html+='<button class="scard-opt" onclick="openOptSheet(segsRef['+i+'])" title="優化這段">✨</button>';
-      html+='</div>';
-      // Body
-      html+='<div class="scard-body">';
-      // 視覺說明
-      if(seg.visualLines&&seg.visualLines.length){
-        html+='<div class="scard-section">';
-        html+='<div class="scard-section-label">🎥 畫面說明</div>';
-        seg.visualLines.forEach(function(line){
-          html+='<div class="scard-visual-item"><div class="scard-visual-dot"></div><div class="scard-visual-text">'+line+'</div></div>';
-        });
-        html+='</div>';
-      }
-      // 口播腳本
-      if(seg.script){
-        if(seg.visualLines&&seg.visualLines.length) html+='<div class="scard-divider"></div>';
-        html+='<div class="scard-section">';
-        html+='<div class="scard-section-label">🎙 口播腳本'+(seg.scriptNote?' <span style="color:var(--text3);font-weight:400">'+seg.scriptNote+'</span>':'')+'</div>';
-        html+='<div class="scard-script">'+seg.script.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')+'</div>';
-        html+='</div>';
-      }
-      html+='</div></div>';
-    });
+    if (currentCardIdx === -1) {
+      // 全部瀏覽模式
+      segs.forEach(function(s, i) {
+        html += renderSingleCard(s, i, segs, false);
+      });
+    } else {
+      // 單張卡片模式
+      html += renderSingleCard(seg, idx, segs, true);
+
+      // 底部導航
+      html += '<div class="card-bottom-nav">';
+      html += '<button class="card-nav-btn prev" onclick="goToCard('+(idx-1)+')" '+(idx===0?'disabled':'')+'>← 上一張</button>';
+      html += '<div style="font-size:12px;color:var(--text3)">'+( idx+1)+' / '+total+'</div>';
+      html += '<button class="card-nav-btn next" onclick="goToCard('+(idx+1)+')" '+(idx===total-1?'disabled':'')+'>下一張 →</button>';
+      html += '</div>';
+    }
 
     // 製作備註折疊
-    if(notes&&notes.length){
-      html+='<div class="production-notes" id="prod-notes">';
-      html+='<div class="production-notes-header" onclick="toggleNotes()">';
-      html+='<span style="font-size:16px">💡</span>';
-      html+='<div class="production-notes-title">製作備註</div>';
-      html+='<div class="production-notes-chevron'+(notesOpen?' open':'')+'">›</div>';
-      html+='</div>';
-      html+='<div class="production-notes-body'+(notesOpen?' open':'')+'">';
-      notes.forEach(function(note){
-        if(note.rows&&note.rows.length){
-          note.rows.forEach(function(row){
-            html+='<div class="note-row"><div class="note-key">'+row.key+'</div><div class="note-val">'+row.val+'</div></div>';
+    if (notes && notes.length) {
+      html += '<div class="production-notes" id="prod-notes" style="margin-top:12px">';
+      html += '<div class="production-notes-header" onclick="toggleNotes()">';
+      html += '<span style="font-size:16px">💡</span>';
+      html += '<div class="production-notes-title">製作備註</div>';
+      html += '<div class="production-notes-chevron'+(notesOpen?' open':'')+'">›</div>';
+      html += '</div>';
+      html += '<div class="production-notes-body'+(notesOpen?' open':'')+'">';
+      notes.forEach(function(note) {
+        if (note.rows && note.rows.length) {
+          note.rows.forEach(function(row) {
+            html += '<div class="note-row"><div class="note-key">'+row.key+'</div><div class="note-val">'+row.val+'</div></div>';
           });
         } else {
-          html+='<div style="font-size:12px;color:var(--text2);line-height:1.7">'+note.raw+'</div>';
+          html += '<div style="font-size:12px;color:var(--text2);line-height:1.7">'+note.raw+'</div>';
         }
       });
-      html+='</div></div>';
+      html += '</div></div>';
     }
+
   } else {
-    // 原始文字或解析失敗
-    html+='<div class="script-toolbar">';
-    html+='<button class="copy-all-btn" onclick="copyAllScript()">📋 複製完整腳本</button>';
-    if(parsed) html+='<button class="raw-toggle on" onclick="toggleRaw()">分鏡卡片</button>';
-    html+='</div>';
-    html+='<div class="content-box">'+content+'</div>';
+    html += '<div class="script-toolbar">';
+    html += '<button class="copy-all-btn" onclick="copyAllScript()">📋 複製完整腳本</button>';
+    if (parsed) html += '<button class="raw-toggle on" onclick="toggleRaw()">分鏡卡片</button>';
+    html += '</div>';
+    html += '<div class="content-box">'+content+'</div>';
   }
 
-  // 三選一 CTA（腳本產出後顯示）
-  if(!isGen && content && content !== 'AI 正在產出腳本，請稍候...') {
-    html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-top:16px;margin-bottom:4px">';
+  // 三選一 CTA
+  if (!isGen && content && content !== 'AI 正在產出腳本，請稍候...') {
+    html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-top:16px">';
     html += '<div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:12px">腳本看完了，接下來？</div>';
     html += '<div style="display:flex;flex-direction:column;gap:8px">';
     html += '<button onclick="confirmScript(\''+p.id+'\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--green);background:var(--green-bg);color:var(--green);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left"><span style="font-size:20px">✅</span><div><div>滿意，開始準備拍攝</div><div style="font-size:11px;font-weight:400;opacity:.8">進入拍攝節點，照著分鏡逐一拍攝</div></div></button>';
-    html += '<button onclick="switchPhase(\'script\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--purple);background:var(--purple-bg);color:var(--purple);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left"><span style="font-size:20px">✏️</span><div><div>某段不太對，想調整</div><div style="font-size:11px;font-weight:400;opacity:.8">點分鏡卡片上的 ✨ 選優化方向</div></div></button>';
+    html += '<button onclick="switchPhase(\'script\',null)" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--purple);background:var(--purple-bg);color:var(--purple);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left"><span style="font-size:20px">✏️</span><div><div>某段不太對，想調整</div><div style="font-size:11px;font-weight:400;opacity:.8">點分鏡卡片上的 ✨ 選優化方向</div></div></button>';
     html += '<button onclick="rewriteScript(\''+p.id+'\')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:left"><span style="font-size:20px">🔄</span><div><div>整份方向不對，重新來過</div><div style="font-size:11px;font-weight:400;opacity:.8">說明哪裡不對，AI 重新產出</div></div></button>';
     html += '</div></div>';
   }
 
   // 留言
-  var cmts=n.comments&&n.comments.length?n.comments.map(function(c){return '<div class="comment '+(c.ai?'ai-c':'user-c')+'"><div class="c-author">'+c.author+'</div><div class="c-text">'+c.text+'</div><div class="c-time">'+c.time+'</div></div>';}).join(''):'<div style="font-size:11px;color:var(--text3);padding:4px 0 8px">尚無留言</div>';
-  html+='<div class="ns-label" style="margin-top:16px">留言與修改建議</div><div class="comments">'+cmts+'</div>';
-  html+='<div class="comment-row"><input id="ci-script" placeholder="輸入修改建議..." /><button class="send-btn" onclick="sendComment(\''+p.id+'\',\'script\')">送出</button></div>';
+  var cmts = n.comments && n.comments.length
+    ? n.comments.map(function(c){ return '<div class="comment '+(c.ai?'ai-c':'user-c')+'"><div class="c-author">'+c.author+'</div><div class="c-text">'+c.text+'</div><div class="c-time">'+c.time+'</div></div>'; }).join('')
+    : '<div style="font-size:11px;color:var(--text3);padding:4px 0 8px">尚無留言</div>';
+  html += '<div class="ns-label" style="margin-top:16px">留言與修改建議</div><div class="comments">'+cmts+'</div>';
+  html += '<div class="comment-row"><input id="ci-script" placeholder="輸入修改建議..." /><button class="send-btn" onclick="sendComment(\''+p.id+'\',\'script\')">送出</button></div>';
   return html;
 }
 
-var segsRef=[];
-function scrollToCard(i){
-  var el=document.getElementById('scard-'+i);
-  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+function renderSingleCard(seg, idx, segs, single) {
+  var html = '';
+  var emojiTags = getEmojiContext(seg.visualLines || [], seg.title);
+  var shootTip = getShootTip(seg.visualLines || [], seg.title);
+
+  // 口播共用區（只在該段第一張子卡顯示，且有多張子卡時）
+  var showSharedScript = seg.script && seg.isSub && seg.isFirstSub && !seg.isLastSub;
+  var showNormalScript = seg.script && (!seg.isSub || seg.isLastSub || !seg.isFirstSub || (seg.isFirstSub && seg.isLastSub));
+
+  html += '<div class="scard" id="scard-'+idx+'">';
+
+  // Header
+  var headerBg = seg.color + '15';
+  html += '<div class="scard-header" style="background:'+headerBg+';border-bottom:1px solid '+seg.color+'25">';
+  html += '<div class="scard-num" style="background:'+seg.color+'">'+seg.index+'</div>';
+  var titleText = seg.isSub && !seg.isFirstSub ? (seg.title + ' <span style="opacity:.6;font-size:11px">續</span>') : seg.title;
+  html += '<div class="scard-title" style="color:'+seg.color+'">'+titleText+'</div>';
+  var timeShow = seg.subTime || seg.timeRange;
+  if (timeShow) html += '<div class="scard-time">'+timeShow+'</div>';
+  html += '<button class="scard-opt" onclick="openOptSheet(segsRef['+idx+'])" title="優化這段">✨</button>';
+  html += '</div>';
+
+  // Body
+  html += '<div class="scard-body">';
+
+  // 畫面說明 - 視覺化呈現
+  if (seg.visualLines && seg.visualLines.length) {
+    html += '<div class="scard-section">';
+    html += '<div class="scard-section-label">🎥 畫面說明</div>';
+    seg.visualLines.forEach(function(line) {
+      html += '<div class="scard-visual-item"><div class="scard-visual-dot" style="background:'+seg.color+'"></div><div class="scard-visual-text">'+line+'</div></div>';
+    });
+    html += '</div>';
+
+    // Emoji 情境板
+    html += '<div class="emoji-context">';
+    emojiTags.forEach(function(tag) {
+      html += '<div class="emoji-tag"><span>'+tag.icon+'</span><span>'+tag.label+'</span></div>';
+    });
+    html += '</div>';
+
+    // 拍攝提示
+    html += '<div class="shoot-tip"><span style="font-size:14px;flex-shrink:0">📌</span><span>'+shootTip+'</span></div>';
+  }
+
+  // 口播腳本
+  if (showSharedScript) {
+    // 整段共用口播，折疊顯示
+    html += '<div class="scard-divider"></div>';
+    html += '<div class="scard-section">';
+    html += '<div class="scard-section-label" style="cursor:pointer" onclick="toggleSharedScript(\'shared-script-'+idx+'\')">';
+    html += '🎙 口播腳本（整段共用） <span id="shared-toggle-'+idx+'" style="color:var(--text3);font-size:11px;font-weight:400">▶ 展開</span>';
+    html += '</div>';
+    html += '<div id="shared-script-'+idx+'" style="display:none">';
+    html += '<div class="scard-script">'+seg.script.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')+'</div>';
+    html += '</div>';
+    html += '</div>';
+  } else if (seg.script) {
+    if (seg.visualLines && seg.visualLines.length) html += '<div class="scard-divider"></div>';
+    html += '<div class="scard-section">';
+    html += '<div class="scard-section-label">🎙 口播腳本</div>';
+    html += '<div class="scard-script">'+seg.script.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')+'</div>';
+    html += '</div>';
+  }
+
+  html += '</div></div>';
+  return html;
 }
+
+function toggleSharedScript(id) {
+  var el = document.getElementById(id);
+  var idx = id.replace('shared-script-', '');
+  var toggle = document.getElementById('shared-toggle-' + idx);
+  if (!el) return;
+  var isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  if (toggle) toggle.textContent = isOpen ? '▶ 展開' : '▼ 收起';
+}
+
+function goToCard(idx) {
+  currentCardIdx = idx;
+  var p = projects.filter(function(x){ return x.id === openProject; })[0];
+  if (p) renderPanelContent(p);
+  // 滾到頂部
+  var pc = document.getElementById('panel-content');
+  if (pc) pc.scrollTop = 0;
+  // 讓導航條對應卡片滾入視野
+  setTimeout(function() {
+    var strip = document.getElementById('card-nav-strip');
+    if (!strip) return;
+    var active = strip.querySelector('.card-nav-item.active');
+    if (active) active.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }, 50);
+}
+function scrollToCard(i){goToCard(i);}
 function toggleRaw(){
-  rawScriptMode=!rawScriptMode;
+  rawScriptMode=!rawScriptMode; currentCardIdx=0;
   var p=projects.filter(function(x){return x.id===openProject;})[0];
   if(p) renderPanelContent(p);
 }
@@ -952,7 +1081,7 @@ var projects=[], openProject=null, currentPhase='script', pollTimer=null;
 var newBadgeIds={}, pendingDeleteId=null, undoDeleteId=null, undoDeleteTimer=null, undoDeleteProj=null;
 
 function openPanel(id){
-  openProject=id; currentPhase='script'; rawScriptMode=false; notesOpen=false;
+  openProject=id; currentPhase='script'; rawScriptMode=false; notesOpen=false; currentCardIdx=0;
   if(newBadgeIds[id]){delete newBadgeIds[id];renderList();}
   var p=projects.filter(function(x){return x.id===id;})[0];
   document.getElementById('p-title').textContent=p.title;
@@ -976,7 +1105,7 @@ function renderStepNav(p){
 }
 
 function switchPhase(key,e){
-  currentPhase=key; rawScriptMode=false; notesOpen=false;
+  currentPhase=key; rawScriptMode=false; notesOpen=false; currentCardIdx=0;
   var p=projects.filter(function(x){return x.id===openProject;})[0];
   if(!p) return;
   renderStepNav(p);
