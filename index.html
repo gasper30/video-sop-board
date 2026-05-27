@@ -190,12 +190,12 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 /* 時間軸 */
 .script-timeline{display:flex;align-items:center;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .script-timeline::-webkit-scrollbar{display:none}
-.tl-node{display:flex;flex-direction:column;align-items:center;flex-shrink:0;cursor:pointer}
+.tl-node{display:flex;flex-direction:column;align-items:center;flex-shrink:0;cursor:pointer;min-width:40px;max-width:64px}
 .tl-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px currentColor;flex-shrink:0;transition:transform .15s}
 .tl-node:hover .tl-dot{transform:scale(1.3)}
-.tl-label{font-size:9px;font-weight:700;margin-top:4px;white-space:nowrap;color:var(--text3)}
-.tl-time{font-size:8px;color:var(--text3);margin-top:1px;white-space:nowrap}
-.tl-line{flex:1;height:2px;background:var(--border2);min-width:16px;flex-shrink:0;margin-bottom:20px}
+.tl-label{display:block;font-size:9px;font-weight:700;margin-top:4px;white-space:nowrap;color:var(--text3);overflow:hidden;text-overflow:ellipsis;max-width:62px;text-align:center}
+.tl-time{display:block;font-size:8px;color:var(--text3);margin-top:1px;white-space:nowrap;text-align:center}
+.tl-line{flex:1;height:2px;background:var(--border2);min-width:10px;flex-shrink:0;margin-bottom:22px}
 
 /* 分鏡卡片 */
 .scene-cards-wrap{display:flex;flex-direction:column;gap:10px}
@@ -208,8 +208,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .scard-opt-btn:hover{background:var(--bg2)}
 .scard-body{border-top:1px solid var(--border);padding:12px 14px;background:var(--bg);display:flex;flex-direction:column;gap:10px}
 .scard-row{display:flex;flex-direction:column;gap:4px}
-.scard-row-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.04em}
+.scard-row-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.04em;margin-bottom:2px}
 .scard-row-text{font-size:12px;color:var(--text2);line-height:1.7}
+.scard-divider{height:1px;background:var(--border);margin:2px 0}
 
 /* 優化選單 bottom sheet */
 .opt-sheet{position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center}
@@ -254,9 +255,6 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   .panel{left:auto;right:0;width:480px;border-left:1px solid var(--border)}
   .fab{bottom:30px;right:30px}
   .scene-row{flex-direction:row}
-  .scard-body{flex-direction:row;gap:0}
-  .scard-row{flex:1}
-  .scard-row+.scard-row{border-left:1px solid var(--border);padding-left:14px;margin-left:14px}
 }
 @media(max-width:639px){
   .pc-delete{opacity:1}
@@ -531,46 +529,66 @@ var SEG_COLORS = ['#534AB7','#D85A30','#0F6E56','#BA7517','#993556','#185FA5'];
 function parseScript(rawText) {
   if (!rawText || rawText === 'AI 正在產出腳本，請稍候...') return null;
 
-  // 清除 Markdown 格式符號但保留內容
   function cleanMd(str) {
     return str
-      .replace(/\*\*/g, '')       // 移除 **bold**
-      .replace(/\*/g, '')         // 移除 *italic*
-      .replace(/^#{1,6}\s*/gm,'') // 移除 ## 標題符號
-      .replace(/---+/g,'')        // 移除分隔線
+      .replace(/\*\*/g, '')
+      .replace(/\*/g, '')
+      .replace(/^#{1,6}\s*/gm, '')
+      .replace(/---+/g, '')
       .trim();
   }
 
-  // 抓時間範圍
   function extractTime(str) {
     var m = str.match(/(\d+[\s]*[–\-~～到至][\s]*\d+[\s]*秒|最後[\s]*\d+[\s]*秒|前[\s]*\d+[\s]*秒|\d+[\s]*秒內)/);
     return m ? m[0].trim() : '';
   }
 
-  // 清理標題（移除時間、表情符號以外的雜訊）
   function cleanTitle(str) {
     return str
-      .replace(/\d+[\s]*[–\-~～到至][\s]*\d+[\s]*秒/g,'')
-      .replace(/最後[\s]*\d+[\s]*秒/g,'')
-      .replace(/前[\s]*\d+[\s]*秒/g,'')
-      .replace(/\d+[\s]*秒內/g,'')
-      .replace(/[（(][^）)]*[）)]/g,'')  // 移除括號內容
-      .replace(/\|.*$/,'')               // 移除 | 後面的內容
-      .replace(/^\s*[\-\|]\s*/,'')       // 移除開頭的 - 或 |
+      .replace(/\d+[\s]*[–\-~～到至][\s]*\d+[\s]*秒/g, '')
+      .replace(/最後[\s]*\d+[\s]*秒/g, '')
+      .replace(/前[\s]*\d+[\s]*秒/g, '')
+      .replace(/\d+[\s]*秒內/g, '')
+      .replace(/[（(][^）)]*[）)]/g, '')
+      .replace(/\|.*$/, '')
+      .replace(/^\s*[\-\|]\s*/, '')
+      .trim();
+  }
+
+  // 判斷是否為「非分鏡段落」（純介紹性標題、製作建議、後記等）
+  function isTitleSegment(title, body) {
+    var t = title.toLowerCase();
+    // 符合以下任一條件就過濾掉
+    var skipPatterns = [
+      /腳本$/, /完整.*腳本/, /秒腳本/, /^script$/i,
+      /製作建議/, /後記/, /注意事項/, /補充說明/,
+      /製作說明/, /備注/, /備註/, /使用說明/,
+      /^tip/, /^note/, /^總結/, /^結語/,
+    ];
+    for (var i = 0; i < skipPatterns.length; i++) {
+      if (skipPatterns[i].test(t)) return true;
+    }
+    // body 太短且沒時間範圍，很可能是純標題
+    if (body.trim().length < 20) return true;
+    return false;
+  }
+
+  // 把 bullet 清單轉成可讀格式
+  function formatBullets(str) {
+    return str
+      .replace(/^[\-\*]\s*/gm, '')  // 移除 bullet 符號
+      .replace(/\n+/g, ' / ')        // 換行改成 / 分隔，更易讀
+      .replace(/\s*\/\s*$/, '')      // 移除尾部 /
       .trim();
   }
 
   var segments = [];
-
-  // 判斷格式：Markdown (##) 或 【】
   var isMarkdown = /^#{1,4}\s/m.test(rawText);
-
   var parts;
+
   if (isMarkdown) {
-    // Markdown 格式：以 ## 或 # 開頭切段
     parts = rawText.split(/(?=^#{1,4}\s)/m);
   } else {
-    // 【】格式
     parts = rawText.split(/(?=【)/);
   }
 
@@ -583,7 +601,6 @@ function parseScript(rawText) {
     var body = '';
 
     if (isMarkdown) {
-      // 抓第一行作為標題
       var lines = part.split('\n');
       header = cleanMd(lines[0]);
       body = lines.slice(1).join('\n').trim();
@@ -600,38 +617,38 @@ function parseScript(rawText) {
     var title = cleanTitle(header);
     if (!title) title = '段落 ' + (segIdx + 1);
 
-    // 清理 body 的 Markdown 符號
     var cleanBody = cleanMd(body);
 
-    // 抓視覺說明（多行支援）
-    var visualMatch = cleanBody.match(/(?:視覺|畫面|鏡頭)[：:]\s*([\s\S]*?)(?=\n(?:文案|口播|台詞|CTA|$)|$)/i);
-    // 抓口播文案（多行支援，抓引號內或整段）
-    var scriptMatch = cleanBody.match(/(?:文案|口播|台詞)[：:]\s*([\s\S]*?)(?=\n(?:視覺|畫面|鏡頭|$)|$)/i);
+    // 跳過標題性段落（純說明、沒有實際分鏡）
+    if (isTitleSegment(title, cleanBody)) return;
+    // 跳過過短或純分隔的段落
+    if (cleanBody.length < 5 && !timeRange) return;
+
+    // 抓視覺說明
+    var visualMatch = cleanBody.match(/(?:視覺|畫面|鏡頭)[：:]\s*([\s\S]*?)(?=\n\s*(?:文案|口播|台詞|配音|轉場|---)|$)/i);
+    // 抓口播文案
+    var scriptMatch = cleanBody.match(/(?:文案|口播|台詞|配音)[：:]\s*([\s\S]*?)(?=\n\s*(?:視覺|畫面|鏡頭|---)|$)/i);
 
     var visual = '';
     var script = '';
 
     if (visualMatch) {
-      visual = visualMatch[1].trim()
-        .replace(/^[-\s]+/gm, '- ')  // 統一 bullet 格式
-        .replace(/\n+/g, '\n')
-        .trim();
+      visual = formatBullets(visualMatch[1].trim());
     }
 
     if (scriptMatch) {
-      // 取出引號內的口播文字
       var rawScript = scriptMatch[1].trim();
-      var quoteMatch = rawScript.match(/[「『"]([\s\S]+?)[」』"]/);
-      script = quoteMatch ? quoteMatch[1].trim() : rawScript;
+      // 優先取引號內的口播文字
+      var quoteMatch = rawScript.match(/[「『""]([\s\S]+?)[」』""]/);
+      script = quoteMatch ? quoteMatch[1].trim() : rawScript.replace(/^[\-\*]\s*/gm, '').trim();
     }
 
-    // 如果都抓不到，把 body 整段當腳本
+    // 都抓不到就整段當腳本
     if (!visual && !script) {
       script = cleanBody;
     }
 
-    // 跳過純分隔線或空段
-    if (!title && !script && !visual) return;
+    if (!script && !visual) return;
 
     segIdx++;
     segments.push({
@@ -789,10 +806,13 @@ function renderScriptNode(p) {
         html += '</div>';
         html += '<div class="scard-body">';
         if (seg.visual) {
-          html += '<div class="scard-row"><div class="scard-row-label">🎥 畫面說明</div><div class="scard-row-text">'+seg.visual+'</div></div>';
+          html += '<div class="scard-row"><div class="scard-row-label">🎥 畫面說明</div><div class="scard-row-text" style="color:var(--text2)">'+seg.visual+'</div></div>';
+        }
+        if (seg.visual && seg.script) {
+          html += '<div class="scard-divider"></div>';
         }
         if (seg.script) {
-          html += '<div class="scard-row"><div class="scard-row-label">🎙 口播腳本</div><div class="scard-row-text">'+seg.script+'</div></div>';
+          html += '<div class="scard-row"><div class="scard-row-label">🎙 口播腳本</div><div class="scard-row-text" style="color:var(--text);font-weight:500">'+seg.script+'</div></div>';
         }
         html += '</div></div>';
       });
@@ -1079,7 +1099,9 @@ function showToastUndo(msg, onUndo) {
 }
 
 function openPanel(id) {
-  openProject=id; openNode=null; rawScriptMode=false;
+  openProject=id; rawScriptMode=false;
+  // 預設展開腳本節點（index 0）
+  openNode = 0;
   // 清除 NEW 紅點
   if (newBadgeIds[id]) { delete newBadgeIds[id]; renderList(); }
   var p = projects.filter(function(x){return x.id===id;})[0];
