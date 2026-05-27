@@ -210,19 +210,33 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
 .generating-box{text-align:center;padding:32px 20px;color:var(--purple)}
 .generating-spinner{width:24px;height:24px;border:2px solid var(--purple-bg);border-top-color:var(--purple);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 
-/* 優化選單 */
-.opt-sheet{position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center}
-.opt-sheet.on{display:flex}
-.opt-sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,0.4)}
-.opt-sheet-box{position:relative;background:var(--bg3);border-radius:20px 20px 0 0;padding:20px 18px 40px;width:100%;max-width:480px}
-.opt-sheet-title{font-size:14px;font-weight:700;margin-bottom:4px}
-.opt-sheet-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
-.opt-list{display:flex;flex-direction:column;gap:8px}
-.opt-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;background:var(--bg);transition:all .15s}
-.opt-item:active{background:var(--bg2)}
-.opt-item-icon{font-size:20px;flex-shrink:0}
-.opt-item-text{font-size:13px;font-weight:500}
-.opt-item-hint{font-size:11px;color:var(--text3);margin-top:2px}
+/* ===== AI 優化面板 ===== */
+.ai-opt-panel{position:fixed;inset:0;z-index:40;display:none;align-items:flex-end;justify-content:center}
+.ai-opt-panel.on{display:flex}
+.ai-opt-bg{position:absolute;inset:0;background:rgba(0,0,0,0.45)}
+.ai-opt-box{position:relative;background:var(--bg3);border-radius:20px 20px 0 0;padding:20px 18px 36px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto}
+.ai-opt-header{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px}
+.ai-opt-title{font-size:15px;font-weight:700;color:var(--text)}
+.ai-opt-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.ai-opt-list{display:flex;flex-direction:column;gap:8px}
+.ai-opt-item{display:flex;align-items:center;gap:12px;padding:13px 14px;border:1px solid var(--border);border-radius:var(--r-sm);cursor:pointer;background:var(--bg);transition:all .15s}
+.ai-opt-item:active{background:var(--bg2);transform:scale(.98)}
+.ai-opt-item-icon{font-size:22px;flex-shrink:0}
+.ai-opt-item-text{font-size:13px;font-weight:600;color:var(--text)}
+.ai-opt-item-hint{font-size:11px;color:var(--text3);margin-top:2px}
+/* 對照區 */
+.ai-compare{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.ai-compare-block{border-radius:var(--r-sm);padding:12px 14px}
+.ai-compare-block.original{background:var(--bg2);border:1px solid var(--border)}
+.ai-compare-block.result{background:var(--purple-bg);border:1px solid rgba(83,74,183,0.2)}
+.ai-compare-label{font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.04em;margin-bottom:6px}
+.ai-compare-text{font-size:13px;line-height:1.8;color:var(--text2)}
+.ai-compare-block.result .ai-compare-text{color:var(--text);font-weight:500}
+/* 操作按鈕 */
+.ai-opt-actions{display:flex;gap:8px;margin-top:12px}
+.ai-action-btn{flex:1;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all .15s}
+.ai-action-btn.primary{background:var(--purple);color:#fff}
+.ai-action-btn.secondary{background:var(--bg2);color:var(--text2)}
 
 /* 確認刪除 */
 .confirm-modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:24px}
@@ -350,13 +364,66 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text
   <div class="panel-content" id="panel-content"></div>
 </div>
 
-<!-- 優化選單 -->
-<div class="opt-sheet" id="opt-sheet">
-  <div class="opt-sheet-bg" onclick="closeOptSheet()"></div>
-  <div class="opt-sheet-box">
-    <div class="opt-sheet-title">這段可以怎麼優化？</div>
-    <div class="opt-sheet-sub" id="opt-sheet-sub">選一個方向，複製後貼給 Claude</div>
-    <div class="opt-list" id="opt-list"></div>
+
+<!-- AI 優化面板 -->
+<div class="ai-opt-panel" id="ai-opt-panel">
+  <div class="ai-opt-bg" onclick="closeAiOpt()"></div>
+  <div class="ai-opt-box">
+
+    <!-- 步驟1：選方向 -->
+    <div id="ai-opt-step1">
+      <div class="ai-opt-header">
+        <div style="flex:1">
+          <div class="ai-opt-title">這段可以怎麼優化？</div>
+          <div class="ai-opt-sub" id="ai-opt-sub">選一個方向，AI 幫你直接改</div>
+        </div>
+        <button onclick="closeAiOpt()" style="background:var(--bg2);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--text2);flex-shrink:0">✕</button>
+      </div>
+      <div id="ai-opt-list" class="ai-opt-list"></div>
+    </div>
+
+    <!-- 步驟2：AI 處理中 -->
+    <div id="ai-opt-step2" style="display:none">
+      <div class="ai-opt-header">
+        <div class="ai-opt-title" id="ai-opt-action-title">AI 正在優化...</div>
+      </div>
+      <div style="text-align:center;padding:32px 20px">
+        <div class="generating-spinner" style="margin:0 auto 12px"></div>
+        <div style="font-size:13px;color:var(--purple);font-weight:600">正在優化這段內容</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:6px">約 5–10 秒</div>
+      </div>
+    </div>
+
+    <!-- 步驟3：對照結果 -->
+    <div id="ai-opt-step3" style="display:none">
+      <div class="ai-opt-header">
+        <div style="flex:1">
+          <div class="ai-opt-title">優化完成 ✨</div>
+          <div class="ai-opt-sub">對照看看，選你喜歡的</div>
+        </div>
+        <button onclick="closeAiOpt()" style="background:var(--bg2);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--text2);flex-shrink:0">✕</button>
+      </div>
+      <div class="ai-compare">
+        <div class="ai-compare-block original">
+          <div class="ai-compare-label">📝 原始版本</div>
+          <div class="ai-compare-text" id="ai-original-text"></div>
+        </div>
+        <div class="ai-compare-block result">
+          <div class="ai-compare-label">✨ 優化後版本</div>
+          <div class="ai-compare-text" id="ai-result-text"></div>
+        </div>
+      </div>
+      <div id="ai-edit-area" style="display:none;margin-top:10px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">✏️ 在此手動調整</div>
+        <textarea id="ai-edit-textarea" style="width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--r-sm);font-size:13px;font-family:inherit;color:var(--text);background:var(--bg);outline:none;resize:none;min-height:90px;line-height:1.6"></textarea>
+      </div>
+      <div class="ai-opt-actions">
+        <button onclick="toggleAiEdit()" id="ai-edit-btn" class="ai-action-btn secondary">✏️ 手動調整</button>
+        <button onclick="adoptAiResult()" class="ai-action-btn primary">✅ 採用這個</button>
+      </div>
+      <button onclick="showAiStep1()" style="width:100%;padding:10px;background:transparent;border:none;font-size:12px;color:var(--text3);cursor:pointer;margin-top:2px;font-family:inherit">↩️ 換個方向試試</button>
+    </div>
+
   </div>
 </div>
 
@@ -698,43 +765,148 @@ function parseScript(rawText) {
 }
 
 // ===== 優化選單 =====
-var OPT_ACTIONS=[
-  {icon:'🗣',text:'讓這段更口語化',hint:'像在跟朋友聊天，保留重點',isHook:false,
-   prompt:function(s){return '請把以下腳本改得更口語化：\n- 文字白話，像在跟朋友聊天\n- 避免機器化段落結構\n- 保留核心重點\n\n以下是這段內容：\n'+(s.script||s.visualLines.join('\n'));}},
-  {icon:'⚡',text:'加強開場吸引力',hint:'前三秒抓住眼球，只優化開頭',isHook:true,
-   prompt:function(s){return '把以下腳本改成短影音爆款 Hook：\n- 前三秒要抓住眼球\n- 節奏快、不拖沓\n- 只優化開頭\n\n以下是這段內容：\n'+(s.script||s.visualLines.join('\n'));}},
-  {icon:'✂️',text:'這段太長，幫我縮短',hint:'保留最核心一個重點',isHook:false,
-   prompt:function(s){return '把以下腳本縮短到一半以內：\n- 保留最核心一個重點\n- 刪除重複或不必要說明\n- 維持原本語氣\n\n以下是這段內容：\n'+(s.script||s.visualLines.join('\n'));}},
-  {icon:'😄',text:'加點幽默感',hint:'輕鬆比喻或自嘲，不刻意',isHook:false,
-   prompt:function(s){return '幫以下腳本加入幽默感：\n- 加一個輕鬆比喻或自嘲\n- 不要刻意搞笑\n- 保留原本重點\n\n以下是這段內容：\n'+(s.script||s.visualLines.join('\n'));}},
-  {icon:'💥',text:'讓情緒更強烈',hint:'加強衝擊力和緊迫感',isHook:false,
-   prompt:function(s){return '把以下腳本情緒強度提高：\n- 用詞更有衝擊力\n- 加強畫面感和緊迫感\n- 讓觀眾感覺跟自己有關\n\n以下是這段內容：\n'+(s.script||s.visualLines.join('\n'));}}
+var OPT_ACTIONS = [
+  {icon:'🗣', text:'讓這段更口語化', hint:'像在跟朋友聊天，保留重點', isHook:false,
+   systemPrompt:'你是短影音腳本優化師。請把以下口播腳本改得更口語化：文字白話像在跟朋友聊天、避免機器化結構、保留核心重點。只輸出修改後的腳本文字，不要任何說明或標題。'},
+  {icon:'⚡', text:'加強開場吸引力', hint:'前三秒抓住眼球，只優化開頭', isHook:true,
+   systemPrompt:'你是短影音腳本優化師。請把以下口播腳本的開頭改成短影音爆款 Hook：前三秒要抓住眼球、節奏快不拖沓、只優化開頭後半段維持不動。只輸出修改後的完整腳本文字，不要任何說明。'},
+  {icon:'✂️', text:'這段太長，幫我縮短', hint:'保留最核心一個重點', isHook:false,
+   systemPrompt:'你是短影音腳本優化師。請把以下口播腳本縮短到一半以內：保留最核心一個重點、刪除重複或不必要說明、維持原本語氣風格。只輸出修改後的腳本文字，不要任何說明。'},
+  {icon:'😄', text:'加點幽默感', hint:'輕鬆比喻或自嘲，不刻意', isHook:false,
+   systemPrompt:'你是短影音腳本優化師。請幫以下口播腳本加入幽默感：加一個輕鬆比喻或自嘲、不要刻意搞笑、保留原本重點。只輸出修改後的腳本文字，不要任何說明。'},
+  {icon:'💥', text:'讓情緒更強烈', hint:'加強衝擊力和緊迫感', isHook:false,
+   systemPrompt:'你是短影音腳本優化師。請把以下口播腳本情緒強度提高：用詞更有衝擊力、加強畫面感和緊迫感、讓觀眾感覺跟自己有關。只輸出修改後的腳本文字，不要任何說明。'}
 ];
-var currentOptSeg=null;
-function openOptSheet(seg){
-  currentOptSeg=seg;
-  var isHook=seg.title.toLowerCase().indexOf('hook')>-1||seg.index===1;
-  document.getElementById('opt-sheet-sub').textContent='「'+seg.title+(seg.subTime?' '+seg.subTime:'')+'」段落';
-  var list=document.getElementById('opt-list');
-  list.innerHTML='';
-  OPT_ACTIONS.filter(function(a){return !a.isHook||isHook;}).forEach(function(a){
-    var el=document.createElement('div');
-    el.className='opt-item';
-    el.innerHTML='<div class="opt-item-icon">'+a.icon+'</div><div><div class="opt-item-text">'+a.text+'</div><div class="opt-item-hint">'+a.hint+'</div></div>';
-    el.onclick=function(){
-      var text=a.prompt(seg);
-      copyText(text,'✅ 已複製！貼給 Claude 優化這段');
-      closeOptSheet();
-    };
+
+var currentOptSeg = null;
+var currentOptResult = '';
+var currentOptField = ''; // 'script' or 'visual'
+
+function openOptSheet(seg) {
+  currentOptSeg = seg;
+  var isHook = seg.title.toLowerCase().indexOf('hook') > -1 || seg.index === 1;
+  var segLabel = '「' + seg.title + (seg.subTime ? ' ' + seg.subTime : '') + '」';
+  document.getElementById('ai-opt-sub').textContent = segLabel + ' 段落';
+
+  var list = document.getElementById('ai-opt-list');
+  list.innerHTML = '';
+  OPT_ACTIONS.filter(function(a){ return !a.isHook || isHook; }).forEach(function(a) {
+    var el = document.createElement('div');
+    el.className = 'ai-opt-item';
+    el.innerHTML = '<div class="ai-opt-item-icon">'+a.icon+'</div><div><div class="ai-opt-item-text">'+a.text+'</div><div class="ai-opt-item-hint">'+a.hint+'</div></div>';
+    el.onclick = function() { runAiOptimize(a, seg); };
     list.appendChild(el);
   });
-  document.getElementById('opt-sheet').classList.add('on');
-}
-function closeOptSheet(){document.getElementById('opt-sheet').classList.remove('on');}
 
-function copyText(text,msg){
-  if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){showToast(msg);});}
-  else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast(msg);}
+  showAiStep1();
+  document.getElementById('ai-opt-panel').classList.add('on');
+}
+
+function showAiStep1() {
+  document.getElementById('ai-opt-step1').style.display = 'block';
+  document.getElementById('ai-opt-step2').style.display = 'none';
+  document.getElementById('ai-opt-step3').style.display = 'none';
+}
+
+async function runAiOptimize(action, seg) {
+  // 取得要優化的文字（優先口播，沒有就用畫面說明）
+  var originalText = seg.script || (seg.visualLines || []).join('\n');
+  if (!originalText.trim()) { showToast('這段沒有口播文字可以優化'); return; }
+
+  currentOptField = seg.script ? 'script' : 'visual';
+
+  // 切換到步驟2
+  document.getElementById('ai-opt-step1').style.display = 'none';
+  document.getElementById('ai-opt-step2').style.display = 'block';
+  document.getElementById('ai-opt-action-title').textContent = action.icon + ' ' + action.text + '中...';
+
+  try {
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: action.systemPrompt,
+        messages: [{ role: 'user', content: originalText }]
+      })
+    });
+
+    var data = await response.json();
+    var resultText = data.content && data.content[0] ? data.content[0].text : '';
+
+    if (!resultText) throw new Error('no result');
+
+    currentOptResult = resultText.trim();
+
+    // 顯示結果
+    document.getElementById('ai-opt-step2').style.display = 'none';
+    document.getElementById('ai-opt-step3').style.display = 'block';
+    document.getElementById('ai-original-text').textContent = originalText;
+    document.getElementById('ai-result-text').textContent = currentOptResult;
+    document.getElementById('ai-edit-area').style.display = 'none';
+    document.getElementById('ai-edit-btn').textContent = '✏️ 手動調整';
+    document.getElementById('ai-edit-textarea').value = currentOptResult;
+
+  } catch(e) {
+    console.error('AI optimize error:', e);
+    showToast('優化失敗，請再試一次');
+    showAiStep1();
+  }
+}
+
+function toggleAiEdit() {
+  var area = document.getElementById('ai-edit-area');
+  var btn = document.getElementById('ai-edit-btn');
+  var isOpen = area.style.display !== 'none';
+  area.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '✏️ 手動調整' : '✕ 取消調整';
+  if (!isOpen) {
+    document.getElementById('ai-edit-textarea').value = currentOptResult;
+    document.getElementById('ai-edit-textarea').focus();
+  }
+}
+
+async function adoptAiResult() {
+  if (!currentOptSeg || !openProject) return;
+
+  var editArea = document.getElementById('ai-edit-area');
+  var finalText = editArea.style.display !== 'none'
+    ? document.getElementById('ai-edit-textarea').value.trim()
+    : currentOptResult;
+
+  if (!finalText) return;
+
+  var p = projects.filter(function(x){ return x.id === openProject; })[0];
+  if (!p) return;
+
+  // 更新 segsRef 裡對應 segment 的 script
+  var segIdx = segsRef.indexOf(currentOptSeg);
+  if (segIdx > -1) segsRef[segIdx].script = finalText;
+
+  // 重建 nodes.script.content（把優化後的文字寫回原始內容）
+  // 用簡單方式：在原始 content 裡找到對應口播段落並替換
+  var content = p.nodes.script.content || '';
+  var oldScript = currentOptSeg.script;
+  if (oldScript && content.includes(oldScript)) {
+    content = content.replace(oldScript, finalText);
+    p.nodes.script.content = content;
+    await dbUpdate(openProject, { nodes: p.nodes, updated_at: new Date().toISOString() });
+  }
+
+  closeAiOpt();
+  renderPanelContent(p);
+  showToast('✅ 已採用優化版本！');
+}
+
+function closeAiOpt() {
+  document.getElementById('ai-opt-panel').classList.remove('on');
+  currentOptSeg = null; currentOptResult = '';
+}
+
+function copyText(text, msg) {
+  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ showToast(msg); }); }
+  else { var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast(msg); }
 }
 
 // ===== 渲染腳本節點 =====
