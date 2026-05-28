@@ -809,37 +809,39 @@ function showAiStep1() {
 }
 
 async function runAiOptimize(action, seg) {
-  // 取得要優化的文字（優先口播，沒有就用畫面說明）
   var originalText = seg.script || (seg.visualLines || []).join('\n');
   if (!originalText.trim()) { showToast('這段沒有口播文字可以優化'); return; }
 
   currentOptField = seg.script ? 'script' : 'visual';
 
-  // 切換到步驟2
   document.getElementById('ai-opt-step1').style.display = 'none';
   document.getElementById('ai-opt-step2').style.display = 'block';
   document.getElementById('ai-opt-action-title').textContent = action.icon + ' ' + action.text + '中...';
 
   try {
-    var response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: action.systemPrompt,
-        messages: [{ role: 'user', content: originalText }]
-      })
-    });
+    // 透過 Supabase Edge Function 呼叫 Claude（避免 CORS）
+    var response = await fetch(
+      SUPABASE_URL + '/functions/v1/claude-optimize',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+        },
+        body: JSON.stringify({
+          systemPrompt: action.systemPrompt,
+          userText: originalText
+        })
+      }
+    );
 
+    if (!response.ok) throw new Error('HTTP ' + response.status);
     var data = await response.json();
-    var resultText = data.content && data.content[0] ? data.content[0].text : '';
-
+    var resultText = data.result || '';
     if (!resultText) throw new Error('no result');
 
     currentOptResult = resultText.trim();
 
-    // 顯示結果
     document.getElementById('ai-opt-step2').style.display = 'none';
     document.getElementById('ai-opt-step3').style.display = 'block';
     document.getElementById('ai-original-text').textContent = originalText;
@@ -850,7 +852,7 @@ async function runAiOptimize(action, seg) {
 
   } catch(e) {
     console.error('AI optimize error:', e);
-    showToast('優化失敗，請再試一次');
+    showToast('優化失敗，請稍後再試');
     showAiStep1();
   }
 }
